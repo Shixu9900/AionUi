@@ -28,6 +28,10 @@ import { dispatchWorkspaceToggleEvent } from '@renderer/utils/workspace/workspac
 import { MIN_PREVIEW_PANEL_PX } from '@renderer/pages/conversation/utils/layoutCalc';
 import { PreviewPanel } from '@renderer/pages/conversation/Preview';
 import { LayoutContext } from '@renderer/hooks/context/LayoutContext';
+import { useThemeContext } from '@renderer/hooks/context/ThemeContext';
+import asiIcon from '@renderer/assets/brand/a-icon.svg';
+import asiLockupDark from '@renderer/assets/brand/asi-lockup_dark.svg';
+import asiLockupLight from '@renderer/assets/brand/asi-lockup_light.svg';
 import { NavigationHistoryProvider } from '@renderer/hooks/context/NavigationHistoryContext';
 import { useDeepLink } from '@renderer/hooks/system/useDeepLink';
 import { useNotificationClick } from '@renderer/hooks/system/notification/useNotificationClick';
@@ -144,7 +148,9 @@ const Layout: React.FC<{
     return () => setGlobalNavigate(null);
   }, [navigate]);
   const { t } = useTranslation();
-  // The "AionUi" wordmark acts as Home / Back-to-Chat, but only from settings routes.
+  const { theme } = useThemeContext();
+  const asiLockup = theme === 'dark' ? asiLockupDark : asiLockupLight;
+  // The ASI lockup acts as Home / Back-to-Chat, but only from settings routes.
   // In non-settings routes the user is already "home", so it is a no-op (and not actionable).
   const isSettingsRoute = location.pathname.startsWith('/settings');
   // Only wired to the wordmark in the isSettingsRoute branch below, so the
@@ -398,39 +404,19 @@ const Layout: React.FC<{
                   }
                 )}
               >
-                <div
-                  className={classNames('bg-black shrink-0 size-32px relative rd-0.5rem', {
-                    '!size-24px': collapsed,
-                  })}
-                  onClick={onClick}
-                >
-                  <svg
-                    className={classNames('w-5.5 h-5.5 absolute inset-0 m-auto', {
-                      'scale-140': !collapsed,
-                    })}
-                    viewBox='0 0 80 80'
-                    fill='none'
-                  >
-                    <path
-                      key='logo-path-1'
-                      d='M40 20 Q38 22 25 40 Q23 42 26 42 L30 42 Q32 40 40 30 Q48 40 50 42 L54 42 Q57 42 55 40 Q42 22 40 20'
-                      fill='white'
-                    ></path>
-                    <circle key='logo-circle' cx='40' cy='46' r='3' fill='white'></circle>
-                    <path
-                      key='logo-path-2'
-                      d='M18 50 Q40 70 62 50'
-                      stroke='white'
-                      strokeWidth='3.5'
-                      fill='none'
-                      strokeLinecap='round'
-                    ></path>
-                  </svg>
-                </div>
-                {isSettingsRoute ? (
+                {collapsed ? (
+                  <img
+                    src={asiIcon}
+                    alt='ASI'
+                    className='asi-brand-mark shrink-0 size-24px'
+                    onClick={onClick}
+                  />
+                ) : isSettingsRoute ? (
                   <Tooltip content={t('common.back', { defaultValue: 'Back to Chat' })} position='bottom'>
-                    <div
-                      className='text-16px text-t-primary collapsed-hidden font-semibold cursor-pointer'
+                    <img
+                      src={asiLockup}
+                      alt='ASI'
+                      className='h-28px w-auto cursor-pointer'
                       role='button'
                       tabIndex={0}
                       aria-label={t('common.back', { defaultValue: 'Back to Chat' })}
@@ -441,12 +427,10 @@ const Layout: React.FC<{
                           handleBrandHome();
                         }
                       }}
-                    >
-                      AionUi
-                    </div>
+                    />
                   </Tooltip>
                 ) : (
-                  <div className='text-16px text-t-primary collapsed-hidden font-semibold'>AionUi</div>
+                  <img src={asiLockup} alt='ASI' className='asi-brand-mark h-28px w-auto' onClick={onClick} />
                 )}
                 {isMobile && !collapsed && (
                   <button
