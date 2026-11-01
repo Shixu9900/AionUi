@@ -29,7 +29,7 @@ import styles from './index.module.css';
 
 const MASTER_SKILL_DIR = `${AVIATOR_ROOT}/skills/create-workflow`;
 const MASTER_SKILL = 'create-workflow';
-const MASTER_NAME = '工作流师傅';
+const MASTER_NAME = '叶师傅';
 const DRAFT_POLL_MS = 2000;
 // The master rewrites draft.json every turn; a per-turn approval prompt would bury the expert.
 const TEACH_PERMISSION = 'yolo';
@@ -39,7 +39,7 @@ type AionrsConversation = Extract<TChatConversation, { type: 'aionrs' }>;
 const EMPTY_DELIVER: DeliverState = { workflowMd: '', saved: false, assistantCreated: false, busy: false };
 
 const kickoff = (job: string) =>
-  `我们开始吧。我想教你一项工作：「${job}」。请按工作流师傅的方法，从第一步「这是什么工作」开始问我。`;
+  `我们开始吧，叶师傅。我想教你一项工作：「${job}」。请按工作流师傅的方法，从第一步「这是什么工作」开始问我。`;
 
 const skillFromWorkflow = (skillName: string, job: string, workflowMd: string) =>
   `---\nname: ${skillName}\ndescription: ${job}。由专家在「创建工作流」中教会并确认的工作方法。只含做法和判断规则。\n---\n\n${workflowMd}\n`;
@@ -198,7 +198,7 @@ const CreateWorkflowPage: React.FC = () => {
         ),
       ]);
       setDeliver((prev) => ({ ...prev, saved: true }));
-      Message.success('已保存到工作流库。');
+      Message.success('这份 SOP 已保存。');
     } finally {
       setDeliver((prev) => ({ ...prev, busy: false }));
     }
@@ -223,7 +223,7 @@ const CreateWorkflowPage: React.FC = () => {
   if (!library) {
     return (
       <div className={styles.page}>
-        <div className={styles.library}>正在打开工作流库……</div>
+        <div className={styles.library}>正在打开……</div>
       </div>
     );
   }
@@ -244,7 +244,7 @@ const CreateWorkflowPage: React.FC = () => {
       <main className={styles.chat}>
         <div className={styles.chatHead}>
           <Button size='small' type='text' onClick={backToLibrary}>
-            ← 工作流库
+            ← 返回
           </Button>
           <span className={styles.chatTitle}>{draft.job?.name || session.title}</span>
           <span className={styles.guideHint}>想说话：点一下输入框，连按两下 Fn 开始听写，再按一下 Fn 结束</span>
@@ -260,7 +260,7 @@ const CreateWorkflowPage: React.FC = () => {
           {conversation ? (
             <TeachChat conversation={conversation} assistantId={session.assistantId} />
           ) : (
-            <div className={styles.chatEmpty}>正在连接工作流师傅……</div>
+            <div className={styles.chatEmpty}>正在连接叶师傅……</div>
           )}
         </div>
       </main>

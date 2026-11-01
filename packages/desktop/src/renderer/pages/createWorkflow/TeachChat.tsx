@@ -32,10 +32,10 @@ export const TeachChat: React.FC<{ conversation: AionrsConversation; assistantId
       workspace={conversation.extra.workspace}
       modelSelection={modelSelection}
       session_mode={conversation.extra?.session_mode}
-      agent_name='工作流师傅'
+      agent_name='叶师傅'
       assistantId={assistantId}
       loadedSkills={(conversation.extra as { skills?: string[] }).skills}
-      emptySlot={<div className={styles.chatEmpty}>工作流师傅正在准备第一个问题……</div>}
+      emptySlot={<div className={styles.chatEmpty}>叶师傅正在准备第一个问题……</div>}
     />
   );
 };

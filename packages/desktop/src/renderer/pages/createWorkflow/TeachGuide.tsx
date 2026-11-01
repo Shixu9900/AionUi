@@ -157,7 +157,7 @@ export const TeachGuide: React.FC<{
                 </div>
                 <div className='flex flex-wrap gap-8px'>
                   <Button type='primary' disabled={!deliver.workflowMd} loading={deliver.busy} onClick={onSave}>
-                    {deliver.saved ? '已保存，再存一次' : '保存到工作流库'}
+                    {deliver.saved ? '已保存，再存一次' : '保存这份 SOP'}
                   </Button>
                   <Button disabled={!deliver.saved} loading={deliver.busy} onClick={onCreateAssistant}>
                     {deliver.assistantCreated ? '已建好测试助手，再建一个' : '建一个测试助手试试'}

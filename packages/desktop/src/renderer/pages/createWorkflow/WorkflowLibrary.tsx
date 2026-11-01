@@ -9,6 +9,7 @@ import { Button, Input, Tag } from '@arco-design/web-react';
 import type { WorkflowDraft, WorkflowTeachSession } from '@/common/types/createWorkflow';
 import { STAGES, stageIndex } from './stages';
 import { deliverDirOf, parseDraft, readText } from './workflowFiles';
+import sifuBanner from './sifuBanner.png';
 import styles from './index.module.css';
 
 type CardInfo = { draft: WorkflowDraft | null; hasMethod: boolean; delivered: boolean };
@@ -60,13 +61,15 @@ export const WorkflowLibrary: React.FC<{
   return (
     <div className={styles.page}>
       <div className={styles.library}>
-        <div className='flex items-center gap-10px'>
-          <h1 className={styles.title}>工作流库</h1>
+        <div className={styles.banner} style={{ backgroundImage: `url(${sifuBanner})` }} role='img' aria-label='叶师傅打咏春拳' />
+        <div className={styles.brandRow}>
+          <h1 className={styles.title}>工作流SOP创建器 — 叶师傅</h1>
+          <span className={styles.sifuEn}>YESIFU</span>
           <Tag color='orange'>管理团队专用</Tag>
         </div>
         <p className={styles.lead}>
-          每一项工作，就是这里的一个工作流。像带新徒弟那样把工作教给「工作流师傅」：它问、你讲，它边听边画出流程，
-          再拿一套真实资料照做一遍请你批改，最后变成助手能照做的工作方法。每个工作流的对话、流程图、资料清单和交付结果都存在它自己名下。
+          行业专家就是师傅。你是叶师傅，把一身功夫教给这个 AI 徒弟：你说一项工作怎么做，它边听边画出流程，
+          再拿一套真实资料照做一遍请你批改，直到你说「学会了」，练成一份 SOP。每一份 SOP 的对话、流程图、资料和交付结果都记在它自己名下。
         </p>
 
         <div className={styles.newCard}>
@@ -85,9 +88,9 @@ export const WorkflowLibrary: React.FC<{
           </div>
         </div>
 
-        <div className={styles.sectionLabel}>已有的工作流（{items.length}）</div>
+        <div className={styles.sectionLabel}>已有的 SOP（{items.length}）</div>
         {items.length === 0 ? (
-          <div className={styles.flowEmpty}>还没有工作流。在上面写下第一项工作的名字就能开始。</div>
+          <div className={styles.flowEmpty}>还没有 SOP。在上面写下第一项工作的名字就能开始。</div>
         ) : (
           <div className={styles.libraryGrid}>
             {items.map((item) => {
