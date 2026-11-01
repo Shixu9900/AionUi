@@ -9,8 +9,8 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 import { Dropdown, Menu, Message, Modal, Tooltip } from '@arco-design/web-react';
-import { Down, More, Plus, Right } from '@icon-park/react';
-import AircraftMark from '@renderer/pages/workbench/AircraftMark';
+import { Down, More, Right } from '@icon-park/react';
+import ReadinessBadge from '@renderer/pages/workbench/ReadinessBadge';
 import { ipcBridge } from '@/common';
 import type { TChatConversation } from '@/common/config/storage';
 import type { AircraftProject } from '@/common/types/aircraftProject';
@@ -223,8 +223,8 @@ const ProjectSider: React.FC<ProjectSiderProps> = ({
               )}
               onClick={() => openProject(project)}
             >
-              <AircraftMark type={project.aircraftType} size={18} />
-              <span className='text-9px leading-11px font-600 max-w-32px truncate'>{project.msn}</span>
+              <ReadinessBadge readiness={project.readiness} compact />
+              <span className='text-9px leading-11px font-600 max-w-32px truncate mt-2px'>{project.msn}</span>
             </div>
           </Tooltip>
         ))}
@@ -271,13 +271,11 @@ const ProjectSider: React.FC<ProjectSiderProps> = ({
           onClick={() => openProject(project)}
         >
           <div className='flex items-center gap-8px min-w-0 pe-20px'>
-            <span className='shrink-0 text-t-secondary'>
-              <AircraftMark type={project.aircraftType} size={36} />
-            </span>
             <span className='min-w-0 text-16px leading-22px font-600 text-t-primary whitespace-nowrap overflow-hidden text-ellipsis'>
               <span className='text-11px font-500 text-t-tertiary me-4px'>MSN</span>
               {project.msn}
             </span>
+            <ReadinessBadge readiness={project.readiness} />
           </div>
           <span className='text-13px leading-18px text-t-primary line-clamp-2 break-all' title={project.name}>
             {project.name}
@@ -326,16 +324,9 @@ const ProjectSider: React.FC<ProjectSiderProps> = ({
             </Dropdown>
           </div>
         </div>
-        {active && (
+        {active && list.length > 0 && (
           <div className='px-6px pb-8px flex flex-col gap-1px'>
             {list.slice(0, CARD_CONVERSATION_LIMIT).map((c) => renderConversationRow(c, true))}
-            <div
-              className='h-30px ps-12px flex items-center gap-6px rd-6px cursor-pointer text-13px text-primary hover:bg-fill-3'
-              onClick={() => askInProject(project)}
-            >
-              <Plus theme='outline' size='12' />
-              <span>{t('conversation.aircraftProject.askInProject')}</span>
-            </div>
           </div>
         )}
       </div>
@@ -354,7 +345,6 @@ const ProjectSider: React.FC<ProjectSiderProps> = ({
           className='mx-2px rd-10px border border-dashed border-[var(--color-border-3)] p-14px flex flex-col items-center gap-6px text-center cursor-pointer hover:bg-fill-2'
           onClick={() => onCreatingChange(true)}
         >
-          <AircraftMark size={28} />
           <span className='text-13px font-500 text-t-primary'>{t('conversation.aircraftProject.emptyTitle')}</span>
           <span className='text-12px text-t-secondary'>{t('conversation.aircraftProject.emptyDesc')}</span>
         </div>

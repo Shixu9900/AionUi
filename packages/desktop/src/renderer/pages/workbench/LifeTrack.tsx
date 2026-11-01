@@ -5,6 +5,7 @@
  */
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ComponentReview, Stint } from '@/common/types/recordsReview';
 
 const DAY = 86_400_000;
@@ -32,6 +33,7 @@ type LifeTrackProps = {
 };
 
 const LifeTrack: React.FC<LifeTrackProps> = ({ review, view }) => {
+  const { t } = useTranslation();
   const [metric, setMetric] = useState<'csn' | 'tsn'>('csn');
   const [hover, setHover] = useState<number | null>(null);
   const [selected, setSelected] = useState<number | null>(null);
@@ -56,7 +58,14 @@ const LifeTrack: React.FC<LifeTrackProps> = ({ review, view }) => {
 
   const laneH = 22;
   const laneGap = 6;
-  const lanes = ['所有人 / 出租人', '运营商', '飞机 · 位置', '发动机', '维修厂', '部件状态'];
+  const lanes = [
+    t('conversation.workbench.lifeTrack.laneOwnerLessor'),
+    t('conversation.workbench.lifeTrack.laneOperator'),
+    t('conversation.workbench.lifeTrack.laneAircraft'),
+    t('conversation.workbench.lifeTrack.laneEngine'),
+    t('conversation.workbench.lifeTrack.laneMro'),
+    t('conversation.workbench.lifeTrack.laneStatus'),
+  ];
   const laneY = (i: number) => 26 + i * (laneH + laneGap);
   const chartTop = laneY(lanes.length) + 18;
   const chartH = 200;
@@ -127,22 +136,22 @@ const LifeTrack: React.FC<LifeTrackProps> = ({ review, view }) => {
   return (
     <div className='flex flex-col gap-8px min-w-0'>
       <div className='flex items-center gap-8px text-12px text-t-secondary'>
-        <span>纵轴</span>
+        <span>{t('conversation.workbench.lifeTrack.yAxis')}</span>
         <button
           type='button'
           className={metric === 'csn' ? 'text-t-primary font-600' : ''}
           onClick={() => setMetric('csn')}
         >
-          循环 CSN
+          {t('conversation.workbench.lifeTrack.cycleMetric')}
         </button>
         <button
           type='button'
           className={metric === 'tsn' ? 'text-t-primary font-600' : ''}
           onClick={() => setMetric('tsn')}
         >
-          小时 TSN
+          {t('conversation.workbench.lifeTrack.hourMetric')}
         </button>
-        <span className='text-t-tertiary'>点飞机色条可只看一段在翼期</span>
+        <span className='text-t-tertiary'>{t('conversation.workbench.lifeTrack.clickHint')}</span>
       </div>
       {view !== 'yearly' && (
         <svg viewBox={`0 0 ${W} ${H}`} width='100%' style={{ display: 'block' }}>
@@ -182,7 +191,7 @@ const LifeTrack: React.FC<LifeTrackProps> = ({ review, view }) => {
             </g>
           ))}
           <text x={W - RIGHT} y={H - 4} fontSize={11} fill='var(--color-text-3)' textAnchor='end'>
-            日历时间（年）
+            {t('conversation.workbench.lifeTrack.calendarAxis')}
           </text>
           {lanes.map((label, i) => (
             <text key={label} x={LEFT - 8} y={laneY(i) + 15} fontSize={11} fill='var(--color-text-2)' textAnchor='end'>
@@ -200,7 +209,7 @@ const LifeTrack: React.FC<LifeTrackProps> = ({ review, view }) => {
                 fill='url(#wb-hatch-gray)'
               />
               <text x={x(dates[0]) + 6} y={laneY(0) + 15} fontSize={11} fill='var(--color-text-2)'>
-                文件未记载所有人 / 出租人
+                {t('conversation.workbench.lifeTrack.unrecordedOwnerLane')}
               </text>
             </g>
           )}
@@ -209,7 +218,7 @@ const LifeTrack: React.FC<LifeTrackProps> = ({ review, view }) => {
               {bar(s.from, s.to, 1, STINT_COLORS[i % STINT_COLORS.length], `op-${i}`)}
               {x(s.to) - x(s.from) > 70 && (
                 <text x={x(s.from) + 6} y={laneY(1) + 15} fontSize={11} fill='#fff'>
-                  {s.operator || '运营商未记载'}
+                  {s.operator || t('conversation.workbench.lifeTrack.operatorUnrecorded')}
                 </text>
               )}
               {bar(s.from, s.to, 2, STINT_COLORS[i % STINT_COLORS.length], `ac-${i}`, 1, () =>
@@ -217,7 +226,7 @@ const LifeTrack: React.FC<LifeTrackProps> = ({ review, view }) => {
               )}
               {x(s.to) - x(s.from) > 80 && (
                 <text x={x(s.from) + 6} y={laneY(2) + 15} fontSize={11} fill='#fff'>
-                  {`${s.host.aircraft || '飞机未记载'}${s.host.position ? ` · ${s.host.position}` : ''}`}
+                  {`${s.host.aircraft || t('conversation.workbench.lifeTrack.aircraftUnrecorded')}${s.host.position ? ` · ${s.host.position}` : ''}`}
                 </text>
               )}
               {bar(s.from, s.to, 5, '#30a46c', `st-${i}`)}
@@ -257,7 +266,7 @@ const LifeTrack: React.FC<LifeTrackProps> = ({ review, view }) => {
                 fill='#e5484d'
                 textAnchor='middle'
               >
-                {`无记录 ${days(cutoff, reviewDate)} 天`}
+                {t('conversation.workbench.lifeTrack.noRecordDays', { days: days(cutoff, reviewDate) })}
               </text>
               <rect
                 x={x(cutoff)}
@@ -270,17 +279,19 @@ const LifeTrack: React.FC<LifeTrackProps> = ({ review, view }) => {
             </g>
           )}
           <text x={LEFT - 8} y={chartTop - 6} fontSize={11} fill='var(--color-text-2)' textAnchor='end'>
-            {metric === 'csn' ? '累计循环' : '累计小时'}
+            {metric === 'csn'
+              ? t('conversation.workbench.lifeTrack.cumulativeCycles')
+              : t('conversation.workbench.lifeTrack.cumulativeHours')}
           </text>
           {metric === 'csn' && limit != null && (
             <g>
               <line x1={LEFT} x2={W - RIGHT} y1={y(limit)} y2={y(limit)} stroke='#e5484d' strokeWidth={1.5} />
               <text x={LEFT + 6} y={y(limit) - 6} fontSize={11} fill='#e5484d'>
-                {`寿命限制 ${fmtN(limit)} 循环`}
+                {t('conversation.workbench.lifeTrack.lifeLimitValue', { value: fmtN(limit) })}
               </text>
               {recorded != null && remaining != null && cutoff && (
                 <text x={x(cutoff) + 6} y={(y(recorded) + y(limit)) / 2} fontSize={12} fill='#30a46c' fontWeight={600}>
-                  {`剩余 ${fmtN(remaining)} 循环`}
+                  {t('conversation.workbench.lifeTrack.remainingValue', { value: fmtN(remaining) })}
                 </text>
               )}
             </g>
@@ -310,7 +321,7 @@ const LifeTrack: React.FC<LifeTrackProps> = ({ review, view }) => {
       <div className='min-h-18px text-12px text-t-secondary'>
         {hm
           ? `${hm.date}  ${hm.label}  ·  TSN ${hm.tsn == null ? '—' : fmtH(hm.tsn)}  ·  CSN ${hm.csn == null ? '—' : fmtN(hm.csn)}`
-          : '鼠标移到圆点上看该节点的日期和读数。横轴是日历年。'}
+          : t('conversation.workbench.lifeTrack.hoverHint')}
       </div>
       {view !== 'yearly' && limit != null && recorded != null && (
         <Budget limit={limit} recorded={recorded} estimated={estimated} stints={stints} />
@@ -326,6 +337,7 @@ const Budget: React.FC<{ limit: number; recorded: number; estimated: number; sti
   estimated,
   stints,
 }) => {
+  const { t } = useTranslation();
   const remain = Math.max(0, limit - recorded - estimated);
   const segs = [
     ...stints.map((s, i) => ({
@@ -340,11 +352,16 @@ const Budget: React.FC<{ limit: number; recorded: number; estimated: number; sti
             key: 'est',
             value: estimated,
             fill: 'repeating-linear-gradient(45deg,#e5484d,#e5484d 2px,transparent 2px,transparent 5px)',
-            label: `无记录期推算 ${fmtN(estimated)}`,
+            label: t('conversation.workbench.lifeTrack.unrecordedEstimate', { value: fmtN(estimated) }),
           },
         ]
       : []),
-    { key: 'rem', value: remain, fill: 'var(--color-fill-3)', label: `剩余 ${fmtN(remain)}` },
+    {
+      key: 'rem',
+      value: remain,
+      fill: 'var(--color-fill-3)',
+      label: t('conversation.workbench.lifeTrack.remainingBudget', { value: fmtN(remain) }),
+    },
   ].filter((s) => s.value > 0);
   return (
     <div>
@@ -354,37 +371,40 @@ const Budget: React.FC<{ limit: number; recorded: number; estimated: number; sti
         ))}
       </div>
       <div className='mt-4px text-11px text-t-tertiary'>
-        {`横轴：累计循环，0 到寿命限制 ${fmtN(limit)}。竖线位置是有据可查的 ${fmtN(recorded)}。无记录期是按最后一段利用率推算的风险，不是记录值。`}
+        {t('conversation.workbench.lifeTrack.budgetCaption', { limit: fmtN(limit), recorded: fmtN(recorded) })}
       </div>
     </div>
   );
 };
 
-const Yearly: React.FC<{ review: ComponentReview }> = ({ review }) => (
-  <div className='overflow-x-auto'>
-    <table className='w-full text-12px text-t-secondary border-collapse'>
-      <thead>
-        <tr className='text-t-tertiary text-left'>
-          <th className='py-4px font-500'>在翼段</th>
-          <th className='font-500'>运营商</th>
-          <th className='font-500'>飞机</th>
-          <th className='font-500 text-right'>使用循环</th>
-          <th className='font-500 text-right'>使用小时</th>
-        </tr>
-      </thead>
-      <tbody>
-        {review.stints.map((s) => (
-          <tr key={`${s.from}-${s.to}`} className='border-t border-t-solid border-[var(--color-border-2)]'>
-            <td className='py-4px'>{`${s.from} → ${s.to}`}</td>
-            <td>{s.operator || '—'}</td>
-            <td>{`${s.host.aircraft || '—'}${s.host.position ? ` · ${s.host.position}` : ''}`}</td>
-            <td className='text-right'>{s.used_csn == null ? '—' : fmtN(s.used_csn)}</td>
-            <td className='text-right'>{s.used_tsn == null ? '—' : fmtH(s.used_tsn)}</td>
+const Yearly: React.FC<{ review: ComponentReview }> = ({ review }) => {
+  const { t } = useTranslation();
+  return (
+    <div className='overflow-x-auto'>
+      <table className='w-full text-12px text-t-secondary border-collapse'>
+        <thead>
+          <tr className='text-t-tertiary text-left'>
+            <th className='py-4px font-500'>{t('conversation.workbench.lifeTrack.tableStint')}</th>
+            <th className='font-500'>{t('conversation.workbench.lifeTrack.tableOperator')}</th>
+            <th className='font-500'>{t('conversation.workbench.lifeTrack.tableAircraft')}</th>
+            <th className='font-500 text-right'>{t('conversation.workbench.lifeTrack.tableUsedCycles')}</th>
+            <th className='font-500 text-right'>{t('conversation.workbench.lifeTrack.tableUsedHours')}</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-);
+        </thead>
+        <tbody>
+          {review.stints.map((s) => (
+            <tr key={`${s.from}-${s.to}`} className='border-t border-t-solid border-[var(--color-border-2)]'>
+              <td className='py-4px'>{`${s.from} → ${s.to}`}</td>
+              <td>{s.operator || '—'}</td>
+              <td>{`${s.host.aircraft || '—'}${s.host.position ? ` · ${s.host.position}` : ''}`}</td>
+              <td className='text-right'>{s.used_csn == null ? '—' : fmtN(s.used_csn)}</td>
+              <td className='text-right'>{s.used_tsn == null ? '—' : fmtH(s.used_tsn)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
 export default LifeTrack;

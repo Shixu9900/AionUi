@@ -1,5 +1,5 @@
 import type { Theme } from '@/common/theme/types';
-import type { AircraftProject } from '@/common/types/aircraftProject';
+import type { AircraftProject, ReviewAction } from '@/common/types/aircraftProject';
 
 export type ConfigKeyMap = {
   language: string;
@@ -24,6 +24,8 @@ export type ConfigKeyMap = {
   'ui.engineerMode': boolean | undefined;
   /** Aircraft projects shown as cards in the engineer-mode sidebar. */
   'aviator.projects': AircraftProject[] | undefined;
+  /** Append-only user judgements (correct / wrong / supplement) and readiness changes, all projects. */
+  'aviator.reviewActions': ReviewAction[] | undefined;
   'window.bounds': { x?: number; y?: number; width: number; height: number } | undefined;
   'webui.desktop.enabled': boolean | undefined;
   'webui.desktop.allowRemote': boolean | undefined;

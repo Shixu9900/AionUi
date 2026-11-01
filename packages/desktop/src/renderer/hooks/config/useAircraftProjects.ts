@@ -30,6 +30,13 @@ export function useAircraftProjects() {
     [projects, setStored]
   );
 
+  const patchProject = useCallback(
+    async (id: string, patch: Partial<AircraftProjectDraft>) => {
+      await setStored(projects.map((p) => (p.id === id ? { ...p, ...patch, updatedAt: Date.now() } : p)));
+    },
+    [projects, setStored]
+  );
+
   const removeProject = useCallback(
     async (id: string) => {
       await setStored(projects.filter((p) => p.id !== id));
@@ -37,5 +44,5 @@ export function useAircraftProjects() {
     [projects, setStored]
   );
 
-  return { projects: sorted, createProject, updateProject, removeProject };
+  return { projects: sorted, createProject, updateProject, patchProject, removeProject };
 }

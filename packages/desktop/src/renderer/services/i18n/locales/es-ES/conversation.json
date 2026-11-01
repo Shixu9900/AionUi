@@ -887,7 +887,8 @@
       "s2": "2  Life chart and budget",
       "s3": "3  History and events",
       "s4": "4  Open items",
-      "s5": "Appendix  Evidence and files"
+      "s5": "Appendix  Evidence and files",
+      "s6": "6  Registro de operaciones y juicios"
     },
     "llpMissing": "No records at this level yet",
     "gear": "Landing gear",
@@ -900,6 +901,70 @@
       "life": "Life",
       "evidence": "Evidence",
       "items": "Open items"
+    },
+    "lifeTrack": {
+      "yAxis": "Eje Y",
+      "cycleMetric": "Ciclos (CSN)",
+      "hourMetric": "Horas (TSN)",
+      "clickHint": "Haz clic en una barra de avión para aislar una etapa",
+      "calendarAxis": "Tiempo calendario (años)",
+      "laneOwnerLessor": "Propietario / Arrendador",
+      "laneOperator": "Operador",
+      "laneAircraft": "Avión · Posición",
+      "laneEngine": "Motor",
+      "laneMro": "Taller MRO",
+      "laneStatus": "Estado del componente",
+      "unrecordedOwnerLane": "Propietario / arrendador no registrado",
+      "operatorUnrecorded": "Operador no registrado",
+      "aircraftUnrecorded": "Avión no registrado",
+      "noRecordDays": "Sin registro durante {{days}} días",
+      "cumulativeCycles": "Ciclos acumulados",
+      "cumulativeHours": "Horas acumuladas",
+      "lifeLimitValue": "Límite de vida {{value}} ciclos",
+      "remainingValue": "{{value}} ciclos restantes",
+      "hoverHint": "Pasa el cursor sobre un punto para ver su fecha y lectura. El eje X son años calendario.",
+      "budgetCaption": "Eje X: ciclos acumulados, de 0 al límite de vida de {{limit}}. La línea vertical marca el valor documentado de {{recorded}}. El tramo sin registro es una estimación de riesgo basada en la tasa de la última etapa, no un valor registrado.",
+      "unrecordedEstimate": "Estimación sin registro {{value}}",
+      "remainingBudget": "{{value}} restantes",
+      "tableStint": "Etapa en ala",
+      "tableOperator": "Operador",
+      "tableAircraft": "Avión",
+      "tableUsedCycles": "Ciclos usados",
+      "tableUsedHours": "Horas usadas"
+    },
+    "readiness": {
+      "title": "Preparación para la devolución",
+      "not_ready": "No listo",
+      "ready": "Listo",
+      "delivered": "Entregado",
+      "confirmReady": "Confirmar listo",
+      "needConfirm": "Primero marca cada conclusión como correcta o complementada",
+      "markDelivered": "Marcar entregado",
+      "reopen": "Volver a no listo",
+      "undoDelivered": "Deshacer entrega"
+    },
+    "trace": {
+      "correct": "Correcto",
+      "wrong": "Incorrecto",
+      "supplement": "Complementar",
+      "items": {
+        "verdict": "Dictamen"
+      },
+      "progress": "{{done}}/{{total}} confirmados",
+      "systemValue": "Resultado del sistema: {{value}}",
+      "wrongPlaceholder": "¿Qué está mal y cuál debería ser el valor? Cita la página si puedes.",
+      "supplementPlaceholder": "¿Qué hay que añadir a este resultado?",
+      "noteRequired": "Escribe una nota primero. Irá al informe.",
+      "noteHint": "Este juicio se registra con la hora y aparece en el registro de operaciones del informe.",
+      "logTitle": "Registro de operaciones",
+      "logHint": "Cada juicio y cambio de estado del consultor. Las entradas incorrectas y complementadas muestran dónde se cambió un resultado a mano.",
+      "logEmpty": "Aún no hay juicios.",
+      "accuracy": "Precisión del sistema {{pct}}%",
+      "colTime": "Hora",
+      "colItem": "Elemento",
+      "colSystem": "Resultado del sistema",
+      "colChoice": "Juicio",
+      "colNote": "Nota"
     }
   }
 }

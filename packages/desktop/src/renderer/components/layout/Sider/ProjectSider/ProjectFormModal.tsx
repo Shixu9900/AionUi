@@ -11,7 +11,6 @@ import { FolderOpen } from '@icon-park/react';
 import { ipcBridge } from '@/common';
 import { AIRCRAFT_PROJECT_KINDS, type AircraftProject, type AircraftProjectLine } from '@/common/types/aircraftProject';
 import type { AircraftProjectDraft } from '@renderer/hooks/config/useAircraftProjects';
-import AircraftMark from '@renderer/pages/workbench/AircraftMark';
 
 const AIRCRAFT_TYPES = [
   'A319',
@@ -43,7 +42,6 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ visible, project, o
   const [submitting, setSubmitting] = useState(false);
   const [choosingLine, setChoosingLine] = useState(false);
   const workspace = Form.useWatch('workspace', form) as string | undefined;
-  const aircraftType = Form.useWatch('aircraftType', form) as string | undefined;
   const line = (Form.useWatch('line', form) as AircraftProjectLine | undefined) ?? 'transition';
 
   useEffect(() => {
@@ -154,15 +152,7 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ visible, project, o
         </Form.Item>
         <div className='flex gap-12px'>
           <Form.Item label={t('conversation.aircraftProject.aircraftType')} field='aircraftType' className='flex-1'>
-            <div className='flex items-center gap-8px'>
-              <AircraftMark type={aircraftType} size={40} />
-              <AutoComplete
-                data={AIRCRAFT_TYPES}
-                placeholder='A330-200'
-                value={aircraftType}
-                onChange={(value) => form.setFieldValue('aircraftType', value)}
-              />
-            </div>
+            <AutoComplete data={AIRCRAFT_TYPES} placeholder='A330-200' />
           </Form.Item>
           <Form.Item label={t('conversation.aircraftProject.registration')} field='registration' className='flex-1'>
             <Input placeholder='N285AY' />

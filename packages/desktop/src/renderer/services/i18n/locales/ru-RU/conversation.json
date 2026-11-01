@@ -902,7 +902,8 @@
       "s2": "2  Life chart and budget",
       "s3": "3  History and events",
       "s4": "4  Open items",
-      "s5": "Appendix  Evidence and files"
+      "s5": "Appendix  Evidence and files",
+      "s6": "6  Operation log and judgements"
     },
     "llpMissing": "No records at this level yet",
     "gear": "Landing gear",
@@ -915,6 +916,70 @@
       "life": "Life",
       "evidence": "Evidence",
       "items": "Open items"
+    },
+    "lifeTrack": {
+      "yAxis": "Y axis",
+      "cycleMetric": "Cycles (CSN)",
+      "hourMetric": "Hours (TSN)",
+      "clickHint": "Click an aircraft bar to isolate one stint",
+      "calendarAxis": "Calendar time (years)",
+      "laneOwnerLessor": "Owner / Lessor",
+      "laneOperator": "Operator",
+      "laneAircraft": "Aircraft · Position",
+      "laneEngine": "Engine",
+      "laneMro": "MRO",
+      "laneStatus": "Component status",
+      "unrecordedOwnerLane": "Owner / Lessor not on file",
+      "operatorUnrecorded": "Operator not on file",
+      "aircraftUnrecorded": "Aircraft not on file",
+      "noRecordDays": "No record for {{days}} days",
+      "cumulativeCycles": "Cumulative cycles",
+      "cumulativeHours": "Cumulative hours",
+      "lifeLimitValue": "Life limit {{value}} cycles",
+      "remainingValue": "{{value}} cycles remaining",
+      "hoverHint": "Hover a dot to see its date and reading. The x-axis is calendar years.",
+      "budgetCaption": "X-axis: cumulative cycles, 0 to the life limit of {{limit}}. The vertical line marks the on-record value of {{recorded}}. The no-record span is a risk estimate from the last stint's rate, not a recorded value.",
+      "unrecordedEstimate": "No-record estimate {{value}}",
+      "remainingBudget": "{{value}} remaining",
+      "tableStint": "Stint",
+      "tableOperator": "Operator",
+      "tableAircraft": "Aircraft",
+      "tableUsedCycles": "Cycles used",
+      "tableUsedHours": "Hours used"
+    },
+    "readiness": {
+      "title": "Redelivery readiness",
+      "not_ready": "Not ready",
+      "ready": "Ready",
+      "delivered": "Delivered",
+      "confirmReady": "Confirm ready",
+      "needConfirm": "Judge every conclusion as correct or supplemented first",
+      "markDelivered": "Mark delivered",
+      "reopen": "Back to not ready",
+      "undoDelivered": "Undo delivered"
+    },
+    "trace": {
+      "correct": "Correct",
+      "wrong": "Wrong",
+      "supplement": "Supplement",
+      "items": {
+        "verdict": "Verdict"
+      },
+      "progress": "{{done}}/{{total}} confirmed",
+      "systemValue": "System result: {{value}}",
+      "wrongPlaceholder": "What is wrong, and what should it be? Cite the page if you can.",
+      "supplementPlaceholder": "What should be added to this result?",
+      "noteRequired": "Write a note first. It goes into the report.",
+      "noteHint": "This judgement is recorded with the time and shows in the report's operation log.",
+      "logTitle": "Operation log",
+      "logHint": "Every judgement and status change by the consultant. Wrong and supplement entries show where a result was changed by hand.",
+      "logEmpty": "No judgements yet.",
+      "accuracy": "System accuracy {{pct}}%",
+      "colTime": "Time",
+      "colItem": "Item",
+      "colSystem": "System result",
+      "colChoice": "Judgement",
+      "colNote": "Note"
     }
   }
 }
