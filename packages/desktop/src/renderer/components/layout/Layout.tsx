@@ -18,6 +18,9 @@ import { usePreviewContext } from '@renderer/pages/conversation/Preview';
 import { ProjectPanelHost } from '@renderer/components/layout/ProjectPanelHost';
 import { ProjectPanelMobileOverlay } from '@renderer/components/layout/ProjectPanelMobileOverlay';
 import { RecordsReviewHost } from '@renderer/components/layout/RecordsReviewHost';
+import { useEngineerMode } from '@renderer/hooks/config/useEngineerMode';
+import ProcessStrip from '@renderer/pages/workbench/ProcessStrip';
+import ProjectSite from '@renderer/pages/workbench/ProjectSite';
 import { setCurrentProject, useCurrentProject } from '@renderer/pages/conversation/explorer/currentProjectStore';
 import { setCurrentConversation } from '@renderer/pages/conversation/explorer/currentConversationStore';
 import { useContainerWidth } from '@renderer/pages/conversation/hooks/useContainerWidth';
@@ -154,6 +157,7 @@ const Layout: React.FC<{
   // The ASI lockup acts as Home / Back-to-Chat, but only from settings routes.
   // In non-settings routes the user is already "home", so it is a no-op (and not actionable).
   const isSettingsRoute = location.pathname.startsWith('/settings');
+  const engineerWorkbench = useEngineerMode() && !isSettingsRoute;
   // Only wired to the wordmark in the isSettingsRoute branch below, so the
   // "no-op outside settings" contract is enforced structurally — no internal
   // route guard needed (the chat-route wordmark is a plain, inert div).
@@ -466,34 +470,40 @@ const Layout: React.FC<{
                 explorer column is a sibling of the route content, above the
                 per-conversation subtree → persists across same-project switches. */}
             <div ref={mainRowRef} className='flex flex-1 min-h-0 overflow-hidden'>
+              {engineerWorkbench && <ProjectSite />}
               <ArcoLayout.Content
                 className={'bg-1 layout-content flex flex-col min-h-0 flex-1'}
                 onClick={() => {
                   if (isMobile && !collapsed) setCollapsed(true);
                 }}
                 style={
-                  isMobile
-                    ? {
-                        width: '100%',
-                      }
-                    : previewMaximized
-                      ? // 最大化时聊天区隐藏（保持挂载不卸载，还原后即刻恢复）
-                        // Hidden while maximized (kept mounted so restoring is instant)
-                        { display: 'none' }
-                      : undefined
+                  engineerWorkbench
+                    ? { width: 420, flexGrow: 0, flexShrink: 0, flexBasis: 420, borderLeft: '1px solid var(--bg-3)' }
+                    : isMobile
+                      ? {
+                          width: '100%',
+                        }
+                      : previewMaximized
+                        ? // 最大化时聊天区隐藏（保持挂载不卸载，还原后即刻恢复）
+                          // Hidden while maximized (kept mounted so restoring is instant)
+                          { display: 'none' }
+                        : undefined
                 }
               >
-                <Outlet />
-                <PwaPullToRefresh />
-                <Suspense fallback={null}>
-                  <UpdateModal />
-                </Suspense>
-                {IS_DISCONTINUED_BUILD && <UpdateMigrationDialog />}
+                {engineerWorkbench && <ProcessStrip />}
+                <div className={engineerWorkbench ? 'flex-1 min-h-0 overflow-hidden flex flex-col' : 'contents'}>
+                  <Outlet />
+                  <PwaPullToRefresh />
+                  <Suspense fallback={null}>
+                    <UpdateModal />
+                  </Suspense>
+                  {IS_DISCONTINUED_BUILD && <UpdateMigrationDialog />}
+                </div>
               </ArcoLayout.Content>
               {/* Hoisted preview region (project conversations only). Structurally
                   persistent: lives above the per-conversation subtree, so a
                   same-project conversation switch does not remount it. */}
-              {previewRegionActive && (
+              {!engineerWorkbench && previewRegionActive && (
                 <div
                   data-project-preview-region
                   className='preview-panel flex flex-col relative overflow-visible'
@@ -533,7 +543,7 @@ const Layout: React.FC<{
                   </div>
                 </div>
               )}
-              {!isMobile && (
+              {!engineerWorkbench && !isMobile && (
                 <ProjectPanelHost
                   widthPx={explorerWidthPx}
                   collapsed={explorerCollapsed}
@@ -544,7 +554,7 @@ const Layout: React.FC<{
                 />
               )}
             </div>
-            {!isMobile && <RecordsReviewHost viewportWidth={viewportWidth} />}
+            {!engineerWorkbench && !isMobile && <RecordsReviewHost viewportWidth={viewportWidth} />}
 
             {/* Mobile overlay: backdrop + fixed panel + floating collapse handle. */}
             {isMobile && Boolean(currentProject) && (

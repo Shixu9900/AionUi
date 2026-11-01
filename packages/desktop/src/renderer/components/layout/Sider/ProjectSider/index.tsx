@@ -9,12 +9,14 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 import { Dropdown, Menu, Message, Modal, Tooltip } from '@arco-design/web-react';
-import { Airplane, Down, More, Plus, Right } from '@icon-park/react';
+import { Down, More, Plus, Right } from '@icon-park/react';
+import AircraftMark from '@renderer/pages/workbench/AircraftMark';
 import { ipcBridge } from '@/common';
 import type { TChatConversation } from '@/common/config/storage';
 import type { AircraftProject } from '@/common/types/aircraftProject';
 import { useConversationHistoryContext } from '@renderer/hooks/context/ConversationHistoryContext';
 import { useAircraftProjects, type AircraftProjectDraft } from '@renderer/hooks/config/useAircraftProjects';
+import { setWorkbenchAircraft } from '@renderer/pages/workbench/workbenchStore';
 import { getActivityTime } from '@renderer/utils/chat/timeline';
 import { cleanupSiderTooltips, type SiderTooltipProps } from '@renderer/utils/ui/siderTooltip';
 import { blurActiveElement } from '@renderer/utils/ui/focus';
@@ -129,6 +131,7 @@ const ProjectSider: React.FC<ProjectSiderProps> = ({
   const select = (id: string | null) => {
     setSelectedId(id);
     writeLocal(ACTIVE_PROJECT_KEY, id);
+    if (id) setWorkbenchAircraft(id);
   };
 
   const askInProject = (project: AircraftProject) => {
@@ -220,7 +223,7 @@ const ProjectSider: React.FC<ProjectSiderProps> = ({
               )}
               onClick={() => openProject(project)}
             >
-              <Airplane theme='outline' size='12' />
+              <AircraftMark type={project.aircraftType} size={18} />
               <span className='text-9px leading-11px font-600 max-w-32px truncate'>{project.msn}</span>
             </div>
           </Tooltip>
@@ -268,13 +271,8 @@ const ProjectSider: React.FC<ProjectSiderProps> = ({
           onClick={() => openProject(project)}
         >
           <div className='flex items-center gap-8px min-w-0 pe-20px'>
-            <span
-              className={classNames(
-                'size-28px shrink-0 rd-7px flex items-center justify-center',
-                active ? 'bg-[rgb(var(--primary-6))] text-white' : 'bg-fill-3 text-t-secondary'
-              )}
-            >
-              <Airplane theme='outline' size='16' />
+            <span className='shrink-0 text-t-secondary'>
+              <AircraftMark type={project.aircraftType} size={36} />
             </span>
             <span className='min-w-0 text-16px leading-22px font-600 text-t-primary whitespace-nowrap overflow-hidden text-ellipsis'>
               <span className='text-11px font-500 text-t-tertiary me-4px'>MSN</span>
@@ -287,7 +285,11 @@ const ProjectSider: React.FC<ProjectSiderProps> = ({
           {subtitle && <span className='text-12px leading-16px text-t-secondary truncate'>{subtitle}</span>}
           <div className='flex items-center gap-6px min-w-0 text-11px leading-16px text-t-tertiary'>
             <span className='shrink-0 px-6px h-18px leading-18px rd-4px bg-fill-3 text-t-secondary'>
-              {t(`conversation.aircraftProject.kinds.${project.kind}`)}
+              {t(
+                project.line === 'component'
+                  ? 'conversation.aircraftProject.lines.component'
+                  : `conversation.aircraftProject.kinds.${project.kind}`
+              )}
             </span>
             <span className='truncate'>
               {t('conversation.aircraftProject.conversationCount', { count: list.length })} · {relativeTime(lastTime)}
@@ -352,7 +354,7 @@ const ProjectSider: React.FC<ProjectSiderProps> = ({
           className='mx-2px rd-10px border border-dashed border-[var(--color-border-3)] p-14px flex flex-col items-center gap-6px text-center cursor-pointer hover:bg-fill-2'
           onClick={() => onCreatingChange(true)}
         >
-          <Airplane theme='outline' size='24' className='text-t-tertiary' />
+          <AircraftMark size={28} />
           <span className='text-13px font-500 text-t-primary'>{t('conversation.aircraftProject.emptyTitle')}</span>
           <span className='text-12px text-t-secondary'>{t('conversation.aircraftProject.emptyDesc')}</span>
         </div>

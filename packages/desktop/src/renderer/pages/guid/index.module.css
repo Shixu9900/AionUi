@@ -442,6 +442,17 @@
   margin-top: -5vh;
 }
 
+.guidContainerDock {
+  justify-content: flex-start;
+  overflow-y: auto;
+  padding-top: 8px;
+}
+
+.guidContainerDock .guidLayout {
+  width: 100%;
+  margin-top: 0;
+}
+
 /* Agent 选中时：先放大再回落至略大（pop 动效） */
 @keyframes agentSelectPop {
   0% {

@@ -672,13 +672,15 @@ const GuidPage: React.FC = () => {
 
   return (
     <ConfigProvider getPopupContainer={() => guidContainerRef.current || document.body}>
-      <div ref={guidContainerRef} className={styles.guidContainer}>
+      <div ref={guidContainerRef} className={`${styles.guidContainer} ${engineerMode ? styles.guidContainerDock : ''}`}>
         <div className={styles.guidLayout}>
-          <div className={styles.heroHeader}>
-            <p className='text-2xl font-semibold mb-0 text-t-primary text-center'>
-              {engineerMode ? t('guid.engineer.title') : t('conversation.welcome.title')}
-            </p>
-          </div>
+          {!engineerMode && (
+            <div className={styles.heroHeader}>
+              <p className='text-2xl font-semibold mb-0 text-t-primary text-center'>
+                {t('conversation.welcome.title')}
+              </p>
+            </div>
+          )}
 
           {!engineerMode && (
             <AssistantSelectionArea

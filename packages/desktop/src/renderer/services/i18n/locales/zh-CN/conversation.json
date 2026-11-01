@@ -832,6 +832,73 @@
     "untitled": "未命名对话",
     "otherConversations": "未归入项目的对话",
     "emptyTitle": "添加第一架飞机",
-    "emptyDesc": "一个项目对应一架飞机，填写 MSN 并选择资料文件夹即可开始"
+    "emptyDesc": "一个项目对应一架飞机，填写 MSN 并选择资料文件夹即可开始",
+    "lines": {
+      "transition": "进退租项目",
+      "transitionHint": "按进退租目录整理一架飞机的资料，并审 LLP。",
+      "component": "部件审查",
+      "componentHint": "只审一个部件，例如一片叶片或一台发动机。",
+      "fleet": "机队管理"
+    },
+    "fleetLocked": "机队版本",
+    "fleetLockedBody": "机队管理属于机队版本。购买机队版本后才能使用。"
+  },
+  "workbench": {
+    "structure": "结构",
+    "aircraft": "飞机",
+    "engine": "发动机",
+    "component": "部件",
+    "process": "过程",
+    "browsing": "你在站点里点了一页",
+    "empty": "这个项目还没有审查结果。把履历放进资料文件夹后再打开。",
+    "aircraftHint": "已算完的部件是 {{sn}}。点进去看结论和寿命。",
+    "openComponent": "打开 {{sn}}",
+    "signed": "已签署",
+    "unsigned": "未签署",
+    "limit": "循环寿命限制",
+    "remainingLabel": "剩余循环",
+    "remaining": "有据可查剩余 {{n}} 循环",
+    "bothChains": "两条链",
+    "reportTitle": "退租报告 · 固定章节",
+    "reportNote": "数字只来自审查引擎。导出 PDF 和表格还没接到这一步。",
+    "pages": {
+      "overview": "结论",
+      "llp": "LLP",
+      "records": "资料",
+      "report": "报告"
+    },
+    "lifeView": {
+      "full": "方案 A 全图",
+      "budget": "轨迹和预算",
+      "yearly": "在翼段"
+    },
+    "drives": {
+      "verdict": "这个件能不能用？",
+      "remain": "还剩多少寿命？",
+      "source": "这个数从哪一页来？",
+      "gap": "还缺什么？",
+      "files": "资料在哪？",
+      "report": "生成退租报告",
+      "llp": "打开 LLP 树"
+    },
+    "report": {
+      "s1": "1  结论与关键数字",
+      "s2": "2  寿命图（方案 A）与预算",
+      "s3": "3  履历与事件",
+      "s4": "4  待办",
+      "s5": "附录  证据与文件"
+    },
+    "llpMissing": "这一级的资料还没有",
+    "gear": "起落架",
+    "recordsHint": "按进退租资料目录。点开章节，再点文件，原文显示在右侧。",
+    "ready": "{{count}} 份已归位",
+    "notReady": "未就绪",
+    "unfiled": "还没归进章节的文件",
+    "pickFile": "点左侧一份文件，这里显示它的页面。",
+    "focus": {
+      "life": "寿命",
+      "evidence": "证据",
+      "items": "待办"
+    }
   }
 }

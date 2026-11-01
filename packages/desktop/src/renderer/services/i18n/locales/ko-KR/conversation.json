@@ -832,6 +832,73 @@
     "untitled": "Untitled conversation",
     "otherConversations": "Conversations outside projects",
     "emptyTitle": "Add your first aircraft",
-    "emptyDesc": "One project per aircraft. Enter the MSN and pick its records folder to start"
+    "emptyDesc": "One project per aircraft. Enter the MSN and pick its records folder to start",
+    "lines": {
+      "transition": "Delivery / redelivery",
+      "transitionHint": "Organize one aircraft's records and review its LLP.",
+      "component": "Component review",
+      "componentHint": "Review a single part, such as one blade or one engine.",
+      "fleet": "Fleet"
+    },
+    "fleetLocked": "Fleet edition",
+    "fleetLockedBody": "Fleet management is part of the fleet edition. It unlocks after that edition is purchased."
+  },
+  "workbench": {
+    "structure": "Structure",
+    "aircraft": "Aircraft",
+    "engine": "Engine",
+    "component": "Component",
+    "process": "Process",
+    "browsing": "Opened from the site",
+    "empty": "This project has no review yet. Put the records in its folder, then open it again.",
+    "aircraftHint": "The reviewed component is {{sn}}. Open it for the verdict and life.",
+    "openComponent": "Open {{sn}}",
+    "signed": "Signed",
+    "unsigned": "Unsigned",
+    "limit": "Cycle life limit",
+    "remainingLabel": "Cycles remaining",
+    "remaining": "{{n}} cycles remaining on record",
+    "bothChains": "Both chains",
+    "reportTitle": "Redelivery report",
+    "reportNote": "Figures come only from the review engine. PDF and spreadsheet export is not wired yet.",
+    "pages": {
+      "overview": "Verdict",
+      "llp": "LLP",
+      "records": "Records",
+      "report": "Report"
+    },
+    "lifeView": {
+      "full": "Full chart",
+      "budget": "Track and budget",
+      "yearly": "Stints"
+    },
+    "drives": {
+      "verdict": "Can this part be accepted?",
+      "remain": "How much life is left?",
+      "source": "Which page is this number from?",
+      "gap": "What is missing?",
+      "files": "Where are the records?",
+      "report": "Build the redelivery report",
+      "llp": "Open the LLP tree"
+    },
+    "report": {
+      "s1": "1  Verdict and key figures",
+      "s2": "2  Life chart and budget",
+      "s3": "3  History and events",
+      "s4": "4  Open items",
+      "s5": "Appendix  Evidence and files"
+    },
+    "llpMissing": "No records at this level yet",
+    "gear": "Landing gear",
+    "recordsHint": "Redelivery records index. Open a section, then a file. The page shows on the right.",
+    "ready": "{{count}} filed",
+    "notReady": "Not ready",
+    "unfiled": "Not filed in a section yet",
+    "pickFile": "Pick a file to show its page here.",
+    "focus": {
+      "life": "Life",
+      "evidence": "Evidence",
+      "items": "Open items"
+    }
   }
 }
