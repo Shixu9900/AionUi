@@ -6,12 +6,23 @@
 
 import React, { useEffect, useState } from 'react';
 import { Button, Input, Tag } from '@arco-design/web-react';
+import { useNavigate } from 'react-router-dom';
 import type { WorkflowDraft, WorkflowTeachSession } from '@/common/types/createWorkflow';
 import { STAGES, stageIndex } from './stages';
 import { deliverDirOf, parseDraft, readText } from './workflowFiles';
 import styles from './index.module.css';
 
 type CardInfo = { draft: WorkflowDraft | null; hasMethod: boolean; delivered: boolean };
+
+/** Leaves the SOP creator for the default workbench. Shown at the top-right of every creator view. */
+export const BackToWorkbench: React.FC = () => {
+  const navigate = useNavigate();
+  return (
+    <Button className={styles.homeButton} onClick={() => void navigate('/guid')}>
+      回到工作台
+    </Button>
+  );
+};
 
 const formatDate = (ms: number) => {
   const date = new Date(ms);
@@ -59,6 +70,9 @@ export const WorkflowLibrary: React.FC<{
 
   return (
     <div className={styles.page}>
+      <div className={styles.homeBar}>
+        <BackToWorkbench />
+      </div>
       <div className={styles.library}>
         <div className={styles.brandRow}>
           <h1 className={styles.title}>工作流SOP创建器 — YESIFU</h1>

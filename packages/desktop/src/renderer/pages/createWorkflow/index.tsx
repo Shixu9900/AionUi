@@ -13,7 +13,7 @@ import { useGuidModelSelection } from '@renderer/pages/guid/hooks/useGuidModelSe
 import { ResultPanel } from './ResultPanel';
 import { TeachChat } from './TeachChat';
 import { TeachGuide, type DeliverState } from './TeachGuide';
-import { WorkflowLibrary } from './WorkflowLibrary';
+import { BackToWorkbench, WorkflowLibrary } from './WorkflowLibrary';
 import {
   AVIATOR_ROOT,
   WORKFLOWS_ROOT,
@@ -224,6 +224,9 @@ const CreateWorkflowPage: React.FC = () => {
   if (!library) {
     return (
       <div className={styles.page}>
+        <div className={styles.homeBar}>
+          <BackToWorkbench />
+        </div>
         <div className={styles.library}>正在打开……</div>
       </div>
     );
@@ -242,6 +245,10 @@ const CreateWorkflowPage: React.FC = () => {
 
   return (
     <div className={styles.teach}>
+      <div className={styles.homeBar}>
+        <BackToWorkbench />
+      </div>
+      <div className={styles.teachBody}>
       <main className={styles.chat}>
         <div className={styles.chatHead}>
           <Button size='small' type='text' onClick={backToLibrary}>
@@ -266,6 +273,7 @@ const CreateWorkflowPage: React.FC = () => {
         </div>
       </main>
       <ResultPanel draft={draft} workflowMd={deliver.workflowMd} />
+      </div>
     </div>
   );
 };

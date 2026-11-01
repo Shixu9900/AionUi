@@ -103,8 +103,31 @@
 
 .teach {
   display: flex;
+  flex-direction: column;
   min-height: 0;
   overflow: hidden;
+}
+
+.homeBar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+  padding: 10px 16px;
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--cw-line);
+}
+
+.homeButton {
+  font-weight: 600;
+}
+
+.teachBody {
+  flex: 1;
+  min-height: 0;
+  display: flex;
 }
 
 .chat {

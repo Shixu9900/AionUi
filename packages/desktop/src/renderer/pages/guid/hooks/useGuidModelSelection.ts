@@ -32,6 +32,32 @@ const isModelKeyAvailable = (key: string | null, providers?: IProvider[]) => {
 /** Provider-based agent keys that share the model list UI */
 type ProviderAgentKey = 'aionrs';
 
+const isDeepseekName = (value: string | undefined): boolean => /deepseek/i.test(value ?? '');
+
+/**
+ * Conversation and post-OCR data work use DeepSeek when that provider is
+ * configured. Page recognition stays on the local OCR engine.
+ */
+export const pickConversationDefault = (
+  providers: IProvider[]
+): { provider: IProvider; model: string } | null => {
+  const withModels = providers.filter((provider) => provider.id && provider.models?.length);
+  const deepseek = withModels.find(
+    (provider) =>
+      isDeepseekName(provider.name) ||
+      isDeepseekName(provider.platform) ||
+      provider.models.some(isDeepseekName)
+  );
+  const chosen = deepseek ?? withModels[0];
+  if (!chosen) return null;
+  const model =
+    chosen.models.find((name) => isDeepseekName(name) && /flash/i.test(name)) ??
+    chosen.models.find(isDeepseekName) ??
+    chosen.models[0];
+  if (!model) return null;
+  return { provider: chosen, model };
+};
+
 export type GuidModelSelectionResult = {
   modelList: IProvider[];
   isGoogleAuth: boolean;
@@ -80,15 +106,13 @@ export const useGuidModelSelection = (agentKey: ProviderAgentKey = 'aionrs'): Gu
 
       selectedModelKeyRef.current = null;
 
-      const defaultModel = modelList[0];
-      const resolvedUseModel = defaultModel?.models[0] ?? '';
-
-      if (!defaultModel || !resolvedUseModel) return;
+      const picked = pickConversationDefault(modelList);
+      if (!picked) return;
 
       await setCurrentModel(
         {
-          ...defaultModel,
-          use_model: resolvedUseModel,
+          ...picked.provider,
+          use_model: picked.model,
         },
         options
       );
