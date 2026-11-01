@@ -794,7 +794,18 @@
       "pass": "Pass",
       "conditional": "Conditional",
       "fail": "Fail"
-    }
+    },
+    "parseTab": "Parse",
+    "reviewTab": "Review",
+    "parseEmpty": "No documents in this project yet. Scan the records folder to add PDFs, Office files, and spreadsheets.",
+    "parseReport": "Parse report",
+    "issues": "Open parse issues",
+    "annotate": "Correct on the page",
+    "passed": "passed",
+    "doubtful": "in doubt",
+    "failed": "failed",
+    "parseNow": "Parse this file",
+    "scanFolder": "Scan records folder"
   },
   "aircraftProject": {
     "new": "New project",

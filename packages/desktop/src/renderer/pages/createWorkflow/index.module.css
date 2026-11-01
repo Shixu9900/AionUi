@@ -23,28 +23,10 @@
   padding: 36px 32px 48px;
 }
 
-.banner {
-  height: 150px;
-  margin-bottom: 14px;
-  border-radius: 14px;
-  background-color: #faebce;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  image-rendering: pixelated;
-}
-
 .brandRow {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.sifuEn {
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.22em;
-  color: var(--cw-accent);
 }
 
 .title {

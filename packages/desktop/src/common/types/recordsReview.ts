@@ -250,3 +250,85 @@ export type ComponentReview = {
   documents: DocumentEntry[];
   field_provenance?: FieldProvenance[];
 };
+
+export type StoredDocument = {
+  doc_id: string;
+  project_id: string;
+  sha256: string;
+  path: string;
+  filename: string;
+  page_count: number;
+  bytes: number;
+  added_at: string;
+  deleted_at: string | null;
+  superseded_by: string | null;
+};
+
+export type StoredPage = {
+  sha256: string;
+  page_no: number;
+  kind: string;
+  rotation: number;
+  skew_degrees: number | null;
+  text_chars: number;
+  image_coverage: number;
+  garbled_ratio: number;
+  status: string;
+  confidence: number | null;
+  provider: string | null;
+};
+
+export type StoredIssue = {
+  issue_id: string;
+  sha256: string;
+  page_no: number;
+  bbox: Bbox | null;
+  code: string;
+  severity: string;
+  detail: string;
+};
+
+export type DocumentReport = {
+  doc_id: string;
+  sha256: string;
+  filename: string;
+  page_count: number;
+  passed: number;
+  doubtful: number;
+  failed: number;
+  issues: StoredIssue[];
+  engine: string;
+};
+
+export type AnnotateRequest = {
+  project_id: string;
+  sha256: string;
+  page_no: number;
+  bbox?: Bbox | null;
+  metric: string;
+  raw: string;
+  value?: number | null;
+};
+
+export type StoredBlock = {
+  block_id: string;
+  sha256: string;
+  page_no: number;
+  label: string | null;
+  bbox: Bbox | null;
+  text: string;
+  html: string | null;
+  confidence: number | null;
+  reading_order: number | null;
+  provider: string;
+};
+
+export type DocumentSearchHit = {
+  project_id: string;
+  doc_id: string;
+  sha256: string;
+  filename: string;
+  page_no: number;
+  block_id: string;
+  snippet: string;
+};

@@ -41,7 +41,17 @@ import type {
   SetConfigOptionRequest,
   SetConfigOptionResponse,
 } from '../types/platform/acpTypes';
-import type { ComponentReview, RecordsReviewPackage } from '../types/recordsReview';
+import type {
+  AnnotateRequest,
+  ComponentReview,
+  DocumentReport,
+  DocumentSearchHit,
+  RecordsReviewPackage,
+  StoredBlock,
+  StoredDocument,
+  StoredIssue,
+  StoredPage,
+} from '../types/recordsReview';
 import type {
   CreateWorkflowCompileRequest,
   CreateWorkflowCompileResult,
@@ -592,6 +602,24 @@ export const project = {
 /** Component records review: deterministic computation over an extracted package. */
 export const recordsReview = {
   compute: httpPost<ComponentReview, RecordsReviewPackage>('/api/records-review/compute'),
+};
+
+export const documents = {
+  list: httpGet<StoredDocument[], { project_id: string }>(
+    (p) => `/api/documents?project_id=${encodeURIComponent(p.project_id)}`
+  ),
+  scan: httpPost<StoredDocument[], { project_id: string; folder: string }>('/api/documents/scan'),
+  parse: httpPost<DocumentReport, { id: string }>((p) => `/api/documents/${p.id}/parse`),
+  report: httpGet<DocumentReport, { id: string }>((p) => `/api/documents/${p.id}/report`),
+  pages: httpGet<StoredPage[], { id: string }>((p) => `/api/documents/${p.id}/pages`),
+  blocks: httpGet<StoredBlock[], { id: string; page_no: number }>(
+    (p) => `/api/documents/${p.id}/blocks?page_no=${p.page_no}`
+  ),
+  issues: httpGet<StoredIssue[], { id: string }>((p) => `/api/documents/${p.id}/issues`),
+  search: httpGet<DocumentSearchHit[], { project_id: string; q: string }>(
+    (p) => `/api/documents/search?project_id=${encodeURIComponent(p.project_id)}&q=${encodeURIComponent(p.q)}`
+  ),
+  annotate: httpPost<unknown, AnnotateRequest>('/api/documents/observations'),
 };
 
 // ---------------------------------------------------------------------------

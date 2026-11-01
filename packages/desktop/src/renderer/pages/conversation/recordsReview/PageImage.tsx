@@ -65,6 +65,71 @@ export const PageThumb: React.FC<{ url: string | null; page: number; bbox: Bbox 
   );
 };
 
+export type PageOverlay = { bbox: Bbox; color: string };
+
+/** Full page with issue/block overlays and optional click-drag annotation. */
+export const PageCanvas: React.FC<{
+  url: string | null;
+  page: number;
+  width: number;
+  overlays: PageOverlay[];
+  draft: Bbox | null;
+  onDraft: (bbox: Bbox | null) => void;
+}> = ({ url, page, width, overlays, draft, onDraft }) => {
+  const image = usePage(url, page, width);
+  const [origin, setOrigin] = useState<{ x: number; y: number } | null>(null);
+  if (image === null || image === 'error') return <Placeholder height={width * 1.3} failed={image === 'error'} />;
+
+  const toNorm = (el: HTMLDivElement, clientX: number, clientY: number): [number, number] => {
+    const rect = el.getBoundingClientRect();
+    const x = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    const y = Math.min(1, Math.max(0, (clientY - rect.top) / rect.height));
+    return [x, y];
+  };
+
+  return (
+    <div
+      className='relative overflow-hidden bg-white'
+      style={{ width, borderRadius: 4, cursor: 'crosshair' }}
+      onMouseDown={(e) => {
+        const [x, y] = toNorm(e.currentTarget, e.clientX, e.clientY);
+        setOrigin({ x, y });
+        onDraft([x, y, x, y]);
+      }}
+      onMouseMove={(e) => {
+        if (!origin) return;
+        const [x, y] = toNorm(e.currentTarget, e.clientX, e.clientY);
+        onDraft([Math.min(origin.x, x), Math.min(origin.y, y), Math.max(origin.x, x), Math.max(origin.y, y)]);
+      }}
+      onMouseUp={() => setOrigin(null)}
+      onMouseLeave={() => setOrigin(null)}
+    >
+      <img src={image.src} alt='' draggable={false} style={{ width: '100%', display: 'block' }} />
+      {overlays.map((overlay, i) => (
+        <Box key={`${overlay.color}-${i}`} bbox={overlay.bbox} color={overlay.color} />
+      ))}
+      {draft && <Box bbox={draft} color='#3b82f6' />}
+    </div>
+  );
+};
+
+const Box: React.FC<{ bbox: Bbox; color: string }> = ({ bbox, color }) => {
+  const [x0, y0, x1, y1] = bbox;
+  return (
+    <div
+      className='absolute pointer-events-none'
+      style={{
+        left: `${x0 * 100}%`,
+        top: `${y0 * 100}%`,
+        width: `${Math.max(x1 - x0, 0.004) * 100}%`,
+        height: `${Math.max(y1 - y0, 0.004) * 100}%`,
+        outline: `2px solid ${color}`,
+        background: `${color}22`,
+      }}
+    />
+  );
+};
+
 /** Magnified crop centred on the value, so the number is legible on a small card. */
 export const PageLens: React.FC<{ url: string | null; page: number; bbox: Bbox; width: number; height: number }> = ({
   url,

@@ -29,7 +29,8 @@ import styles from './index.module.css';
 
 const MASTER_SKILL_DIR = `${AVIATOR_ROOT}/skills/create-workflow`;
 const MASTER_SKILL = 'create-workflow';
-const MASTER_NAME = '叶师傅';
+const MASTER_NAME = 'YESIFU 徒弟';
+const MASTER_ALIASES = [MASTER_NAME, '叶师傅', '工作流师傅'];
 const DRAFT_POLL_MS = 2000;
 // The master rewrites draft.json every turn; a per-turn approval prompt would bury the expert.
 const TEACH_PERMISSION = 'yolo';
@@ -39,7 +40,7 @@ type AionrsConversation = Extract<TChatConversation, { type: 'aionrs' }>;
 const EMPTY_DELIVER: DeliverState = { workflowMd: '', saved: false, assistantCreated: false, busy: false };
 
 const kickoff = (job: string) =>
-  `我们开始吧，叶师傅。我想教你一项工作：「${job}」。请按工作流师傅的方法，从第一步「这是什么工作」开始问我。`;
+  `徒弟，我来教你一项工作：「${job}」。按师傅教徒弟的方法，从第一步「这是什么工作」开始问我。`;
 
 const skillFromWorkflow = (skillName: string, job: string, workflowMd: string) =>
   `---\nname: ${skillName}\ndescription: ${job}。由专家在「创建工作流」中教会并确认的工作方法。只含做法和判断规则。\n---\n\n${workflowMd}\n`;
@@ -108,11 +109,11 @@ const CreateWorkflowPage: React.FC = () => {
   const ensureMasterAssistant = async (): Promise<string> => {
     await ipcBridge.fs.importSkill.invoke({ skill_path: MASTER_SKILL_DIR });
     const list = await ipcBridge.assistants.list.invoke();
-    const existing = list.find((assistant) => assistant.name === MASTER_NAME);
+    const existing = list.find((assistant) => MASTER_ALIASES.includes(assistant.name));
     if (existing) return existing.id;
     const created = await ipcBridge.assistants.create.invoke({
       name: MASTER_NAME,
-      description: '像徒弟一样跟专家学一项工作，整理成助手能照做的工作方法。管理团队专用。',
+      description: 'YESIFU 的 AI 徒弟：跟行业师傅学一项工作，整理成助手能照做的 SOP。管理团队专用。',
       enabled_skills: [MASTER_SKILL],
     });
     return created.id;
@@ -260,7 +261,7 @@ const CreateWorkflowPage: React.FC = () => {
           {conversation ? (
             <TeachChat conversation={conversation} assistantId={session.assistantId} />
           ) : (
-            <div className={styles.chatEmpty}>正在连接叶师傅……</div>
+            <div className={styles.chatEmpty}>徒弟正在准备……</div>
           )}
         </div>
       </main>

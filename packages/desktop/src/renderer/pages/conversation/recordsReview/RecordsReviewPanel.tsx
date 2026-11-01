@@ -21,6 +21,7 @@ import type {
   TimelineEntry,
   Verdict,
 } from '@/common/types/recordsReview';
+import { ParseTab } from './ParseTab';
 import { ConfirmBar } from './ConfirmBar';
 import { CHAIN_COLOR, EvidenceGraph } from './EvidenceGraph';
 import { PageThumb } from './PageImage';
@@ -427,6 +428,7 @@ export const RecordsReviewPanel: React.FC<{ projectId: string }> = ({ projectId 
   const [focus, setFocus] = useState<Set<string>>(new Set());
   const [card, setCard] = useState<EvidenceCard | null>(null);
   const [fullGraph, setFullGraph] = useState(false);
+  const [tab, setTab] = useState<'review' | 'parse'>('review');
 
   const review = data?.status === 'ready' ? data.review : null;
   const fileUrl = useMemo(() => (data?.status === 'ready' ? data.fileUrl : () => ''), [data]);
@@ -448,6 +450,22 @@ export const RecordsReviewPanel: React.FC<{ projectId: string }> = ({ projectId 
   const header = (
     <div className='flex items-center gap-8px px-14px h-44px border-b border-b-solid border-[var(--bg-3)] flex-shrink-0'>
       <span className='text-14px font-700 text-t-primary'>{t('conversation.recordsReview.title')}</span>
+      <button
+        type='button'
+        className='text-12px border-none cursor-pointer rd-4px px-8px py-2px'
+        style={{ background: tab === 'review' ? 'var(--bg-2)' : 'transparent', color: 'var(--text-primary)' }}
+        onClick={() => setTab('review')}
+      >
+        {t('conversation.recordsReview.reviewTab')}
+      </button>
+      <button
+        type='button'
+        className='text-12px border-none cursor-pointer rd-4px px-8px py-2px'
+        style={{ background: tab === 'parse' ? 'var(--bg-2)' : 'transparent', color: 'var(--text-primary)' }}
+        onClick={() => setTab('parse')}
+      >
+        {t('conversation.recordsReview.parseTab')}
+      </button>
       {review && verdictTag(review.verdict, t)}
       <div className='ml-auto flex items-center gap-4px'>
         <Tooltip content={t('conversation.recordsReview.refresh')}>
@@ -459,6 +477,15 @@ export const RecordsReviewPanel: React.FC<{ projectId: string }> = ({ projectId 
       </div>
     </div>
   );
+
+  if (tab === 'parse') {
+    return (
+      <div className='h-full flex flex-col min-h-0'>
+        {header}
+        <ParseTab projectId={projectId} fileUrl={fileUrl} />
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

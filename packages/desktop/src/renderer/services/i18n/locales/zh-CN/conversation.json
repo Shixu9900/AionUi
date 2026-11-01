@@ -793,7 +793,18 @@
       "pass": "通过",
       "conditional": "有条件通过",
       "fail": "不通过"
-    }
+    },
+    "parseTab": "解析",
+    "reviewTab": "审查",
+    "parseEmpty": "这个项目里还没有入库的文件。先扫描资料夹，把 PDF、Office 和表格加进来。",
+    "parseReport": "解析报告卡",
+    "issues": "存疑清单",
+    "annotate": "在页面上改正",
+    "passed": "通过",
+    "doubtful": "存疑",
+    "failed": "失败",
+    "parseNow": "解析这份文件",
+    "scanFolder": "扫描资料夹"
   },
   "aircraftProject": {
     "new": "新建项目",

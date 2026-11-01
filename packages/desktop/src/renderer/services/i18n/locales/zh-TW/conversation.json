@@ -793,7 +793,18 @@
       "pass": "通過",
       "conditional": "有條件通過",
       "fail": "不通過"
-    }
+    },
+    "parseTab": "解析",
+    "reviewTab": "審查",
+    "parseEmpty": "這個專案還沒有入庫的文件。先掃描資料夾，把 PDF、Office 和表格加進來。",
+    "parseReport": "解析報告卡",
+    "issues": "存疑清單",
+    "annotate": "在頁面上改正",
+    "passed": "通過",
+    "doubtful": "存疑",
+    "failed": "失敗",
+    "parseNow": "解析這份文件",
+    "scanFolder": "掃描資料夾"
   },
   "aircraftProject": {
     "new": "新建專案",
