@@ -1429,5 +1429,7 @@
   "crossSessionMessageDesc": "Дозволяє агентам надсилати повідомлення до ваших інших розмов. Вимкнення також відключає згадку @@ у полі введення.",
   "crossSessionMessageDisabledBanner": "Повідомлення між розмовами вимкнено, згадка @@ недоступна.",
   "crossSessionMessageResume": "Увімкнути знову",
-  "crossSessionMessageUpdateFailed": "Не вдалося оновити налаштування повідомлень між розмовами"
+  "crossSessionMessageUpdateFailed": "Не вдалося оновити налаштування повідомлень між розмовами",
+  "engineerMode": "Engineer mode",
+  "engineerModeDesc": "Hide developer features (agent engine picker, permission modes, skills and MCP, slash-command hints, scheduled tasks, teams) and keep only chat, files and review results"
 }

@@ -36,6 +36,7 @@ import {
 } from '@icon-park/react';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useEngineerMode } from '@/renderer/hooks/config/useEngineerMode';
 import styles from '../index.module.css';
 
 /**
@@ -163,7 +164,9 @@ const GuidActionRow: React.FC<GuidActionRowProps> = ({
       setMcpQuery('');
     }
   }, []);
-  const showModeSwitch = dynamicModes.length > 0;
+  const engineerMode = useEngineerMode();
+  const showModeSwitch = !engineerMode && dynamicModes.length > 0;
+  const showCapabilityMenus = !engineerMode;
   const configOptionCount = (modelSelectorNode ? 1 : 0) + (showModeSwitch ? 1 : 0);
 
   // Browser file picker ref (WebUI only)
@@ -296,7 +299,7 @@ const GuidActionRow: React.FC<GuidActionRowProps> = ({
     }
 
     // Permission / agent mode.
-    if (dynamicModes.length > 0) {
+    if (showModeSwitch) {
       const modeOptions: MobileActionSheetOption[] = dynamicModes.map((mode) => ({
         key: mode.value,
         label: t(`agentMode.${mode.value}`, { defaultValue: mode.label }),
@@ -348,7 +351,7 @@ const GuidActionRow: React.FC<GuidActionRowProps> = ({
     }
 
     // Skills (multi-select).
-    if (allSkills.length > 0) {
+    if (showCapabilityMenus && allSkills.length > 0) {
       entries.push({
         key: 'skills',
         icon: <Lightning theme='outline' size='16' />,
@@ -376,7 +379,7 @@ const GuidActionRow: React.FC<GuidActionRowProps> = ({
     }
 
     // MCP servers (multi-select).
-    if (mcpServers.length > 0) {
+    if (showCapabilityMenus && mcpServers.length > 0) {
       entries.push({
         key: 'mcp',
         icon: <Shield theme='outline' size='16' />,
@@ -403,6 +406,8 @@ const GuidActionRow: React.FC<GuidActionRowProps> = ({
     return entries;
   }, [
     isMobile,
+    showModeSwitch,
+    showCapabilityMenus,
     isGeminiMode,
     modelList,
     current_model,
@@ -472,7 +477,7 @@ const GuidActionRow: React.FC<GuidActionRowProps> = ({
           </div>
         </Menu.Item>
       )}
-      {allSkills.length > 0 && (
+      {showCapabilityMenus && allSkills.length > 0 && (
         <Menu.SubMenu
           key='skills'
           title={
@@ -514,7 +519,7 @@ const GuidActionRow: React.FC<GuidActionRowProps> = ({
           </SubmenuSearchList>
         </Menu.SubMenu>
       )}
-      {mcpServers.length > 0 && (
+      {showCapabilityMenus && mcpServers.length > 0 && (
         <Menu.SubMenu
           key='mcp'
           title={

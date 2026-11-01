@@ -30,6 +30,8 @@ import DevSettings from './DevSettings';
 import BrowserDataSection from './BrowserDataSection';
 import DirInputItem from './DirInputItem';
 import PreferenceRow from './PreferenceRow';
+import { useConfig } from '@/renderer/hooks/config/useConfig';
+import { useEngineerMode } from '@/renderer/hooks/config/useEngineerMode';
 import VoiceInputSection from './VoiceInputSection';
 
 /**
@@ -55,6 +57,8 @@ const SystemModalContent: React.FC = () => {
     platform: 'web',
   });
   const [closeToTray, setCloseToTray] = useState(false);
+  const engineerMode = useEngineerMode();
+  const [, setEngineerMode] = useConfig('ui.engineerMode');
   const [gpuStatus, setGpuStatus] = useState<IGpuStatus | null>(null);
   const [notificationEnabled, setNotificationEnabled] = useState(true);
   const [cronNotificationEnabled, setCronNotificationEnabled] = useState(false);
@@ -357,6 +361,12 @@ const SystemModalContent: React.FC = () => {
 
   const preferenceItems = [
     { key: 'language', label: t('settings.language'), component: <LanguageSwitcher /> },
+    {
+      key: 'engineerMode',
+      label: t('settings.engineerMode'),
+      description: t('settings.engineerModeDesc'),
+      component: <Switch checked={engineerMode} onChange={(checked: boolean) => void setEngineerMode(checked)} />,
+    },
     {
       key: 'startOnBoot',
       label: t('settings.startOnBoot'),

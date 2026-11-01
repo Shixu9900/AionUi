@@ -50,6 +50,7 @@ import { Button, Message, Tag } from '@arco-design/web-react';
 import { Brain, Lightning, MagicHat, Shield } from '@icon-park/react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useEngineerMode } from '@/renderer/hooks/config/useEngineerMode';
 import { classifyConversationBusyError } from '../conversationBusyError';
 import { buildSendFailureError } from './buildSendFailureError';
 import { useAcpInitialMessage } from './useAcpInitialMessage';
@@ -127,7 +128,7 @@ const AcpSendBox: React.FC<{
   const { t } = useTranslation();
   const teamPermission = useTeamPermission();
   // In team mode, all agents show the permission mode selector (members don't propagate)
-  const showModeSelector = true;
+  const showModeSelector = !useEngineerMode();
   const isLeaderInTeam = teamPermission && conversation_id === teamPermission.leaderConversationId;
   const { checkAndUpdateTitle } = useAutoTitle();
   const { atPath, uploadFile, setAtPath, setUploadFile, content, setContent } = useSendBoxDraft(conversation_id);

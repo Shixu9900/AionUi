@@ -1,6 +1,15 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
-import { ArrowCircleLeft, ArrowLeft, ArrowRight, ExpandLeft, ExpandRight, Peoples, Search } from '@icon-park/react';
+import {
+  ArrowCircleLeft,
+  ArrowLeft,
+  ArrowRight,
+  Audit,
+  ExpandLeft,
+  ExpandRight,
+  Peoples,
+  Search,
+} from '@icon-park/react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -17,6 +26,10 @@ import { useFeedback } from '@/renderer/hooks/context/FeedbackContext';
 import { resolveFeedbackModule } from '@/renderer/services/feedback/resolveFeedbackModule';
 import { isElectronDesktop, isMacOS } from '@/renderer/utils/platform';
 import { IS_DISCONTINUED_BUILD } from '@/renderer/utils/discontinuedBuild';
+import {
+  toggleRecordsReview,
+  useRecordsReviewOpen,
+} from '@renderer/pages/conversation/recordsReview/recordsReviewStore';
 import MigrationInviteCapsule from './MigrationInviteCapsule';
 import './titlebar.css';
 
@@ -111,6 +124,7 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const toolbarRef = useRef<HTMLDivElement | null>(null);
   const lastNonSettingsPathRef = useRef('/guid');
+  const recordsReviewOpen = useRecordsReviewOpen();
 
   // 监听工作空间折叠状态，保持按钮图标一致 / Sync workspace collapsed state for toggle button
   useEffect(() => {
@@ -419,6 +433,22 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
         >
           <FeedbackIcon size={iconSize} strokeWidth={desktopIconStroke} />
         </button>
+        {showWorkspaceButton && !layout?.isMobile && (
+          <button
+            type='button'
+            className='app-titlebar__button'
+            onClick={toggleRecordsReview}
+            aria-label={t('conversation.recordsReview.title')}
+            title={t('conversation.recordsReview.title')}
+          >
+            <Audit
+              theme='outline'
+              size={iconSize}
+              fill={recordsReviewOpen ? 'rgb(var(--primary-6))' : 'currentColor'}
+              strokeWidth={desktopIconStroke}
+            />
+          </button>
+        )}
         {showWorkspaceButton && (
           <button
             type='button'

@@ -593,7 +593,8 @@
   "sendbox": {
     "hint": "输入 / 唤起命令，@ 引用文件，↑/↓ 切换历史消息",
     "mediaPathFallback": "该 Agent 不原生支持此文件类型，将以文件路径形式发送。",
-    "hintWithSessions": "输入 / 唤起命令，@ 引用文件，@@ 引用会话，↑/↓ 切换历史消息"
+    "hintWithSessions": "输入 / 唤起命令，@ 引用文件，@@ 引用会话，↑/↓ 切换历史消息",
+    "engineerHint": "向助手提问，或把履历文件拖到这里"
   },
   "agentTip": {
     "codes": {
@@ -782,5 +783,55 @@
     "progress": "{{completed}}/{{total}}",
     "expand": "展开计划",
     "collapse": "收起计划"
+  },
+  "recordsReview": {
+    "title": "部件履历审查",
+    "refresh": "重新计算",
+    "loadFailed": "审查计算失败",
+    "empty": "当前项目根目录下没有 records-review.json。让助手对项目里的履历文件做抽取，生成该文件后点刷新即可看到 TSN/CSN、剩余寿命、拆装时间轴、Open Items 与证据链。",
+    "verdict": {
+      "pass": "通过",
+      "conditional": "有条件通过",
+      "fail": "不通过"
+    }
+  },
+  "aircraftProject": {
+    "new": "新建项目",
+    "sectionTitle": "飞机项目",
+    "createTitle": "新建飞机项目",
+    "editTitle": "编辑项目",
+    "create": "创建",
+    "save": "保存",
+    "saved": "已保存",
+    "msn": "MSN（制造序列号）",
+    "msnRequired": "请填写 MSN",
+    "name": "项目名称",
+    "nameRequired": "请填写项目名称",
+    "namePlaceholder": "例如：N285AY 退租检查",
+    "aircraftType": "机型",
+    "registration": "注册号",
+    "kind": "项目类型",
+    "kinds": {
+      "redelivery": "退租",
+      "delivery": "交付/进租",
+      "midterm": "中期检查",
+      "transaction": "交易尽调",
+      "other": "其他"
+    },
+    "folder": "资料文件夹",
+    "folderHint": "选择存放这架飞机履历资料的文件夹，项目里的对话和审查结果都基于它",
+    "pickFolder": "选择文件夹",
+    "changeFolder": "更换",
+    "edit": "编辑项目信息",
+    "openFolder": "打开资料文件夹",
+    "remove": "从列表移除",
+    "removeTitle": "移除项目「{{name}}」？",
+    "removeContent": "只从左侧列表移除，资料文件和对话记录都会保留。",
+    "conversationCount": "{{count}} 个对话",
+    "askInProject": "在此项目中提问",
+    "untitled": "未命名对话",
+    "otherConversations": "未归入项目的对话",
+    "emptyTitle": "添加第一架飞机",
+    "emptyDesc": "一个项目对应一架飞机，填写 MSN 并选择资料文件夹即可开始"
   }
 }

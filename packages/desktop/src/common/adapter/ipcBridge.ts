@@ -41,6 +41,7 @@ import type {
   SetConfigOptionRequest,
   SetConfigOptionResponse,
 } from '../types/platform/acpTypes';
+import type { ComponentReview, RecordsReviewPackage } from '../types/recordsReview';
 import type {
   CreateProviderRequest,
   FetchModelsAnonymousRequest,
@@ -576,6 +577,11 @@ export const project = {
   removeFolder: httpDelete<void, { project_id: string; pe_id: string }>(
     (p) => `/api/projects/${encodeURIComponent(p.project_id)}/folders/${encodeURIComponent(p.pe_id)}`
   ),
+};
+
+/** Component records review: deterministic computation over an extracted package. */
+export const recordsReview = {
+  compute: httpPost<ComponentReview, RecordsReviewPackage>('/api/records-review/compute'),
 };
 
 // ---------------------------------------------------------------------------

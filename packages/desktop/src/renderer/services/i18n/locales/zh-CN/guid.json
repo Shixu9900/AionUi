@@ -13,5 +13,14 @@
     "specifyWorkspace": "选择项目文件夹",
     "searchPlaceholder": "搜索项目…",
     "noProject": "不使用项目"
+  },
+  "engineer": {
+    "title": "今天要审查哪个部件？",
+    "placeholder": "拖入部件履历 PDF 或整个文件夹，也可以直接提问",
+    "prompts": {
+      "review": "审查这个部件的履历：算出 TSN/CSN 和剩余寿命，列出缺失的资料",
+      "llp": "这台发动机的 LLP 还剩多少寿命？按剩余循环从少到多排列",
+      "certs": "检查这批 EASA Form 1 / 8130-3 有没有签署缺失、件号或序号不一致"
+    }
   }
 }

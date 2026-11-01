@@ -31,5 +31,14 @@
     "understand": "Familiarízate con este proyecto y explícame con palabras sencillas qué hace y por dónde empezar",
     "cleanup": "Encuentra archivos duplicados e inútiles en esta carpeta y lístalos para que los confirme",
     "create": "Créame una página personal bonita y ábrela cuando esté lista"
+  },
+  "engineer": {
+    "title": "Which component are we reviewing today?",
+    "placeholder": "Drop back-to-birth records (PDF or a folder), or just ask",
+    "prompts": {
+      "review": "Review this component's records: compute TSN/CSN and remaining life, and list missing documents",
+      "llp": "How much life is left on this engine's LLPs? Sort by remaining cycles, lowest first",
+      "certs": "Check these EASA Form 1 / 8130-3 certificates for missing signatures or P/N and S/N mismatches"
+    }
   }
 }

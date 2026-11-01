@@ -1,4 +1,5 @@
 import type { Theme } from '@/common/theme/types';
+import type { AircraftProject } from '@/common/types/aircraftProject';
 
 export type ConfigKeyMap = {
   language: string;
@@ -15,6 +16,14 @@ export type ConfigKeyMap = {
   'ui.fontWeight.chat': string | undefined;
   'ui.fontWeight.markdown': string | undefined;
   'ui.fontWeight.code': string | undefined;
+  /**
+   * Aviation-engineer surface: hides developer controls (agent picker,
+   * permission modes, skills/MCP, slash/@ hints, scheduled tasks, teams).
+   * `undefined` means on.
+   */
+  'ui.engineerMode': boolean | undefined;
+  /** Aircraft projects shown as cards in the engineer-mode sidebar. */
+  'aviator.projects': AircraftProject[] | undefined;
   'window.bounds': { x?: number; y?: number; width: number; height: number } | undefined;
   'webui.desktop.enabled': boolean | undefined;
   'webui.desktop.allowRemote': boolean | undefined;

@@ -1414,5 +1414,7 @@
   "crossSessionMessageDesc": "Aracıların diğer sohbetlerinize mesaj göndermesine izin verir. Kapatmak giriş alanındaki @@ sohbet etiketini de devre dışı bırakır.",
   "crossSessionMessageDisabledBanner": "Sohbetler arası mesajlar kapalı, @@ sohbet etiketi kullanılamıyor.",
   "crossSessionMessageResume": "Yeniden aç",
-  "crossSessionMessageUpdateFailed": "Sohbetler arası mesaj ayarı güncellenemedi"
+  "crossSessionMessageUpdateFailed": "Sohbetler arası mesaj ayarı güncellenemedi",
+  "engineerMode": "Engineer mode",
+  "engineerModeDesc": "Hide developer features (agent engine picker, permission modes, skills and MCP, slash-command hints, scheduled tasks, teams) and keep only chat, files and review results"
 }

@@ -12,6 +12,7 @@ import { resolveLocaleKey } from '@/common/utils';
 import type { AssistantDetail } from '@/common/types/agent/assistantTypes';
 
 import { useInputFocusRing } from '@/renderer/hooks/chat/useInputFocusRing';
+import { useEngineerMode } from '@/renderer/hooks/config/useEngineerMode';
 import { appendPromptToDraft } from '@/renderer/hooks/chat/useSendBoxDraft';
 import { getFuzzyMatchIndices, useSlashCommandController } from '@/renderer/hooks/chat/useSlashCommandController';
 import { openExternalUrl } from '@/renderer/utils/platform';
@@ -318,8 +319,10 @@ const GuidPage: React.FC = () => {
     [agentSelection.setSelectedAssistantId]
   );
 
+  const engineerMode = useEngineerMode();
+  const welcomePlaceholder = engineerMode ? t('guid.engineer.placeholder') : t('conversation.welcome.placeholder');
   // Typewriter placeholder
-  const typewriterPlaceholder = useTypewriterPlaceholder(t('conversation.welcome.placeholder'));
+  const typewriterPlaceholder = useTypewriterPlaceholder(welcomePlaceholder);
   const selectedAssistantRecord = useMemo(() => {
     if (!selectedAssistantId) return undefined;
     const selectedId = agentSelection.selectedAssistantId;
@@ -328,6 +331,9 @@ const GuidPage: React.FC = () => {
     return agentSelection.assistants.find((item) => candidates.has(item.id));
   }, [agentSelection.assistants, selectedAssistantId, agentSelection.selectedAssistantId]);
   const selectedAssistantPrompts = useMemo(() => {
+    if (engineerMode) {
+      return [t('guid.engineer.prompts.review'), t('guid.engineer.prompts.llp'), t('guid.engineer.prompts.certs')];
+    }
     if (!selectedAssistantId) return [];
     const resolvedPrompts =
       selectedAssistantDetail?.prompts.recommended_i18n?.[localeKey] ||
@@ -343,7 +349,7 @@ const GuidPage: React.FC = () => {
     }
 
     return [t('guid.defaultPrompts.understand'), t('guid.defaultPrompts.cleanup'), t('guid.defaultPrompts.create')];
-  }, [localeKey, selectedAssistantDetail, selectedAssistantRecord, selectedAssistantId, t]);
+  }, [engineerMode, localeKey, selectedAssistantDetail, selectedAssistantRecord, selectedAssistantId, t]);
 
   // Sync disabledBuiltinSkills + enabledSkills from assistant detail defaults.
   useEffect(() => {
@@ -669,15 +675,19 @@ const GuidPage: React.FC = () => {
       <div ref={guidContainerRef} className={styles.guidContainer}>
         <div className={styles.guidLayout}>
           <div className={styles.heroHeader}>
-            <p className='text-2xl font-semibold mb-0 text-t-primary text-center'>{t('conversation.welcome.title')}</p>
+            <p className='text-2xl font-semibold mb-0 text-t-primary text-center'>
+              {engineerMode ? t('guid.engineer.title') : t('conversation.welcome.title')}
+            </p>
           </div>
 
-          <AssistantSelectionArea
-            selectedAssistantId={agentSelection.selectedAssistantId}
-            assistants={agentSelection.assistants}
-            localeKey={localeKey}
-            onSelectAssistant={handleSelectAssistant}
-          />
+          {!engineerMode && (
+            <AssistantSelectionArea
+              selectedAssistantId={agentSelection.selectedAssistantId}
+              assistants={agentSelection.assistants}
+              localeKey={localeKey}
+              onSelectAssistant={handleSelectAssistant}
+            />
+          )}
 
           <GuidInputCard
             focusRequestKey={navState?.focusPrefill && navState.prefillPrompt ? location.key : undefined}
@@ -687,7 +697,7 @@ const GuidPage: React.FC = () => {
             onPaste={guidInput.onPaste}
             onFocus={guidInput.handleTextareaFocus}
             onBlur={guidInput.handleTextareaBlur}
-            placeholder={typewriterPlaceholder || t('conversation.welcome.placeholder')}
+            placeholder={typewriterPlaceholder || welcomePlaceholder}
             isInputActive={guidInput.isInputFocused}
             isFileDragging={guidInput.isFileDragging}
             activeBorderColor={activeBorderColor}
@@ -732,12 +742,14 @@ const GuidPage: React.FC = () => {
           ) : null}
         </div>
 
-        <QuickActionButtons
-          onOpenLink={openLink}
-          onOpenBugReport={() => setShowFeedbackModal(true)}
-          inactiveBorderColor={inactiveBorderColor}
-          activeShadow={activeShadow}
-        />
+        {!engineerMode && (
+          <QuickActionButtons
+            onOpenLink={openLink}
+            onOpenBugReport={() => setShowFeedbackModal(true)}
+            inactiveBorderColor={inactiveBorderColor}
+            activeShadow={activeShadow}
+          />
+        )}
         <FeedbackReportModal visible={showFeedbackModal} onCancel={() => setShowFeedbackModal(false)} />
       </div>
     </ConfigProvider>

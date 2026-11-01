@@ -1415,5 +1415,7 @@
   "crossSessionMessageDesc": "允许 Agent 向你的其他会话发送消息。关闭后，输入框的 @@ 会话提及与投递能力同时停用。",
   "crossSessionMessageDisabledBanner": "跨会话消息已关闭，输入框的 @@ 会话提及不可用。",
   "crossSessionMessageResume": "重新开启",
-  "crossSessionMessageUpdateFailed": "跨会话消息设置更新失败"
+  "crossSessionMessageUpdateFailed": "跨会话消息设置更新失败",
+  "engineerMode": "工程师模式",
+  "engineerModeDesc": "隐藏面向开发者的功能（助手引擎选择、权限模式、技能与 MCP、斜杠命令提示、定时任务、团队），只保留对话、文件和审查结果"
 }

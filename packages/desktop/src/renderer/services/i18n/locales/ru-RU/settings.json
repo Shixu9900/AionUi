@@ -1428,5 +1428,7 @@
   "crossSessionMessageDesc": "Разрешить агентам отправлять сообщения в ваши другие беседы. При отключении также отключается упоминание @@ в поле ввода.",
   "crossSessionMessageDisabledBanner": "Сообщения между беседами отключены, упоминание @@ недоступно.",
   "crossSessionMessageResume": "Включить снова",
-  "crossSessionMessageUpdateFailed": "Не удалось обновить настройку сообщений между беседами"
+  "crossSessionMessageUpdateFailed": "Не удалось обновить настройку сообщений между беседами",
+  "engineerMode": "Engineer mode",
+  "engineerModeDesc": "Hide developer features (agent engine picker, permission modes, skills and MCP, slash-command hints, scheduled tasks, teams) and keep only chat, files and review results"
 }

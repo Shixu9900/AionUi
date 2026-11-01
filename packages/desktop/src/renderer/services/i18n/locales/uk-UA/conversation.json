@@ -601,7 +601,8 @@
   "sendbox": {
     "hint": "Введіть / для команд, @ для посилань на файли, ↑/↓ для історії повідомлень",
     "mediaPathFallback": "Цей агент не підтримує цей тип файлу нативно; його буде надіслано як шлях до файлу.",
-    "hintWithSessions": "/ — команди, @ — файли, @@ — розмови, ↑/↓ — історія"
+    "hintWithSessions": "/ — команди, @ — файли, @@ — розмови, ↑/↓ — історія",
+    "engineerHint": "Ask the assistant, or drop records here"
   },
   "agentTip": {
     "codes": {
@@ -798,5 +799,55 @@
     "progress": "{{completed}}/{{total}}",
     "expand": "Розгорнути план",
     "collapse": "Згорнути план"
+  },
+  "recordsReview": {
+    "title": "Component records review",
+    "refresh": "Recompute",
+    "loadFailed": "Review computation failed",
+    "empty": "No records-review.json at the project root. Ask the assistant to extract the component records in this project, then refresh to see TSN/CSN, remaining life, the install/removal timeline, open items and the evidence chains.",
+    "verdict": {
+      "pass": "Pass",
+      "conditional": "Conditional",
+      "fail": "Fail"
+    }
+  },
+  "aircraftProject": {
+    "new": "New project",
+    "sectionTitle": "Aircraft projects",
+    "createTitle": "New aircraft project",
+    "editTitle": "Edit project",
+    "create": "Create",
+    "save": "Save",
+    "saved": "Saved",
+    "msn": "MSN (manufacturer serial number)",
+    "msnRequired": "MSN is required",
+    "name": "Project name",
+    "nameRequired": "Project name is required",
+    "namePlaceholder": "e.g. N285AY redelivery review",
+    "aircraftType": "Aircraft type",
+    "registration": "Registration",
+    "kind": "Project type",
+    "kinds": {
+      "redelivery": "Redelivery",
+      "delivery": "Delivery",
+      "midterm": "Mid-term inspection",
+      "transaction": "Transaction due diligence",
+      "other": "Other"
+    },
+    "folder": "Records folder",
+    "folderHint": "The folder holding this aircraft's records; conversations and reviews in the project work from it",
+    "pickFolder": "Choose folder",
+    "changeFolder": "Change",
+    "edit": "Edit project details",
+    "openFolder": "Open records folder",
+    "remove": "Remove from list",
+    "removeTitle": "Remove project \"{{name}}\"?",
+    "removeContent": "Only removes it from the sidebar. Records and conversations are kept.",
+    "conversationCount": "{{count}} conversations",
+    "askInProject": "Ask in this project",
+    "untitled": "Untitled conversation",
+    "otherConversations": "Conversations outside projects",
+    "emptyTitle": "Add your first aircraft",
+    "emptyDesc": "One project per aircraft. Enter the MSN and pick its records folder to start"
   }
 }

@@ -52,6 +52,7 @@ import { Button, Message, Tag } from '@arco-design/web-react';
 import { Brain, Lightning, MagicHat, Shield } from '@icon-park/react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useEngineerMode } from '@/renderer/hooks/config/useEngineerMode';
 import { classifyConversationBusyError } from '../conversationBusyError';
 import { useAionrsMessage } from './useAionrsMessage';
 import type { AionrsModelSelection } from './useAionrsModelSelection';
@@ -139,6 +140,7 @@ const AionrsSendBox: React.FC<{
       status: 'loaded',
     }));
   const { t } = useTranslation();
+  const showModeSelector = !useEngineerMode();
   const { checkAndUpdateTitle } = useAutoTitle();
   const { current_model } = modelSelection;
   const teamPermission = useTeamPermission();
@@ -803,21 +805,23 @@ const AionrsSendBox: React.FC<{
         }
         rightTools={
           <div className='flex items-center gap-8px min-w-0'>
-            <AgentModeSelector
-              backend='aionrs'
-              conversation_id={conversation_id}
-              compact
-              initialMode={session_mode}
-              dynamicModes={dynamicModes}
-              compactLeadingIcon={<Shield theme='outline' size='14' fill={iconColors.secondary} />}
-              modeLabelFormatter={(mode) => t(`agentMode.${mode.value}`, { defaultValue: mode.label })}
-              compactLabelPrefix={t('agentMode.permission')}
-              hideCompactLabelPrefixOnMobile
-              onModeChanged={propagateMode}
-              beforeRuntimeSync={prepareRuntimeConfig}
-              beforeRuntimeSet={teamPermission?.warmupSession}
-              configOptionsPort={teamPermission?.configOptionsPort}
-            />
+            {showModeSelector && (
+              <AgentModeSelector
+                backend='aionrs'
+                conversation_id={conversation_id}
+                compact
+                initialMode={session_mode}
+                dynamicModes={dynamicModes}
+                compactLeadingIcon={<Shield theme='outline' size='14' fill={iconColors.secondary} />}
+                modeLabelFormatter={(mode) => t(`agentMode.${mode.value}`, { defaultValue: mode.label })}
+                compactLabelPrefix={t('agentMode.permission')}
+                hideCompactLabelPrefixOnMobile
+                onModeChanged={propagateMode}
+                beforeRuntimeSync={prepareRuntimeConfig}
+                beforeRuntimeSet={teamPermission?.warmupSession}
+                configOptionsPort={teamPermission?.configOptionsPort}
+              />
+            )}
           </div>
         }
         prefix={

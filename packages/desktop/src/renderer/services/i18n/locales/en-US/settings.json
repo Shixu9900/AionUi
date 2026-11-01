@@ -1414,5 +1414,7 @@
   "crossSessionMessageDesc": "Let agents send messages to your other conversations. Turning this off also disables the @@ conversation mention in the input box.",
   "crossSessionMessageDisabledBanner": "Cross-conversation messages are off, so the @@ conversation mention is unavailable.",
   "crossSessionMessageResume": "Turn back on",
-  "crossSessionMessageUpdateFailed": "Failed to update the cross-conversation message setting"
+  "crossSessionMessageUpdateFailed": "Failed to update the cross-conversation message setting",
+  "engineerMode": "Engineer mode",
+  "engineerModeDesc": "Hide developer features (agent engine picker, permission modes, skills and MCP, slash-command hints, scheduled tasks, teams) and keep only chat, files and review results"
 }

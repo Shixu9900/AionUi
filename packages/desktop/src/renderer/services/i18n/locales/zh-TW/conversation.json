@@ -593,7 +593,8 @@
   "sendbox": {
     "hint": "輸入 / 喚起命令，@ 引用檔案，↑/↓ 切換歷史訊息",
     "mediaPathFallback": "該 Agent 不原生支援此檔案類型，將以檔案路徑形式傳送。",
-    "hintWithSessions": "輸入 / 喚起命令，@ 引用檔案，@@ 引用對話，↑/↓ 切換歷史訊息"
+    "hintWithSessions": "輸入 / 喚起命令，@ 引用檔案，@@ 引用對話，↑/↓ 切換歷史訊息",
+    "engineerHint": "向助手提問，或把履歷檔案拖到這裡"
   },
   "agentTip": {
     "codes": {
@@ -782,5 +783,55 @@
     "progress": "{{completed}}/{{total}}",
     "expand": "展開計劃",
     "collapse": "收合計劃"
+  },
+  "recordsReview": {
+    "title": "部件履歷審查",
+    "refresh": "重新計算",
+    "loadFailed": "審查計算失敗",
+    "empty": "目前專案根目錄下沒有 records-review.json。請助手對專案中的履歷文件進行擷取，產生該檔案後點重新整理即可看到 TSN/CSN、剩餘壽命、拆裝時間軸、Open Items 與證據鏈。",
+    "verdict": {
+      "pass": "通過",
+      "conditional": "有條件通過",
+      "fail": "不通過"
+    }
+  },
+  "aircraftProject": {
+    "new": "新建專案",
+    "sectionTitle": "飛機專案",
+    "createTitle": "新建飛機專案",
+    "editTitle": "編輯專案",
+    "create": "建立",
+    "save": "儲存",
+    "saved": "已儲存",
+    "msn": "MSN（製造序號）",
+    "msnRequired": "請填寫 MSN",
+    "name": "專案名稱",
+    "nameRequired": "請填寫專案名稱",
+    "namePlaceholder": "例如：N285AY 退租檢查",
+    "aircraftType": "機型",
+    "registration": "註冊號",
+    "kind": "專案類型",
+    "kinds": {
+      "redelivery": "退租",
+      "delivery": "交付/進租",
+      "midterm": "中期檢查",
+      "transaction": "交易盡調",
+      "other": "其他"
+    },
+    "folder": "資料資料夾",
+    "folderHint": "選擇存放這架飛機履歷資料的資料夾，專案裡的對話和審查結果都基於它",
+    "pickFolder": "選擇資料夾",
+    "changeFolder": "更換",
+    "edit": "編輯專案資訊",
+    "openFolder": "開啟資料資料夾",
+    "remove": "從列表移除",
+    "removeTitle": "移除專案「{{name}}」？",
+    "removeContent": "只從左側列表移除，資料檔案和對話記錄都會保留。",
+    "conversationCount": "{{count}} 個對話",
+    "askInProject": "在此專案中提問",
+    "untitled": "未命名對話",
+    "otherConversations": "未歸入專案的對話",
+    "emptyTitle": "新增第一架飛機",
+    "emptyDesc": "一個專案對應一架飛機，填寫 MSN 並選擇資料資料夾即可開始"
   }
 }

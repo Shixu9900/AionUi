@@ -13,5 +13,14 @@
     "specifyWorkspace": "選擇專案資料夾",
     "searchPlaceholder": "搜尋專案…",
     "noProject": "不使用專案"
+  },
+  "engineer": {
+    "title": "今天要審查哪個部件？",
+    "placeholder": "拖入部件履歷 PDF 或整個資料夾，也可以直接提問",
+    "prompts": {
+      "review": "審查這個部件的履歷：算出 TSN/CSN 和剩餘壽命，列出缺失的資料",
+      "llp": "這台發動機的 LLP 還剩多少壽命？按剩餘循環從少到多排列",
+      "certs": "檢查這批 EASA Form 1 / 8130-3 有沒有簽署缺失、件號或序號不一致"
+    }
   }
 }

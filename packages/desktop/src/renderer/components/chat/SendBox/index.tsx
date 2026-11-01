@@ -53,6 +53,7 @@ import type { SlashCommandItem } from '@/common/chat/slash/types';
 import { buildSkillSlashCommands, mergeSlashCommands } from '@/common/chat/slash/mergeSlashCommands';
 import React, { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useEngineerMode } from '@/renderer/hooks/config/useEngineerMode';
 import useSWR from 'swr';
 import { useCompositionInput } from '@renderer/hooks/chat/useCompositionInput';
 import { useConversationExport } from '@renderer/hooks/file/useConversationExport';
@@ -349,6 +350,7 @@ const SendBox: React.FC<{
   const effectiveDefaultMultiLine = defaultMultiLine && !isMobileCompact;
   const conversationContext = useConversationContextSafe();
   const { t, i18n } = useTranslation();
+  const engineerMode = useEngineerMode();
   const [isLoading, setIsLoading] = useState(false);
   const [isSingleLine, setIsSingleLine] = useState(!effectiveDefaultMultiLine);
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -1845,11 +1847,13 @@ const SendBox: React.FC<{
    * truncate. The `@@` variant is phrased tighter instead, so it is no longer —
    * in most locales shorter — than the one it replaces.
    */
-  const sendboxHint = canMentionSessions
-    ? t('conversation.sendbox.hintWithSessions', {
-        defaultValue: 'Type / for commands, @ for files, @@ for conversations, ↑/↓ for history',
-      })
-    : t('conversation.sendbox.hint', { defaultValue: 'Type / for commands, @ to reference files' });
+  const sendboxHint = engineerMode
+    ? t('conversation.sendbox.engineerHint')
+    : canMentionSessions
+      ? t('conversation.sendbox.hintWithSessions', {
+          defaultValue: 'Type / for commands, @ for files, @@ for conversations, ↑/↓ for history',
+        })
+      : t('conversation.sendbox.hint', { defaultValue: 'Type / for commands, @ to reference files' });
 
   const mobilePlusButton = isMobileCompact ? (
     <Button
@@ -2154,11 +2158,13 @@ const SendBox: React.FC<{
               spellCheck={false}
               value={input}
               placeholder={
-                isMobileCompact
-                  ? (placeholder ?? (bottomHint as string | undefined) ?? sendboxHint)
-                  : placeholder
-                    ? `${placeholder}  ${bottomHint ?? sendboxHint}`
-                    : ((bottomHint as string | undefined) ?? sendboxHint)
+                engineerMode
+                  ? sendboxHint
+                  : isMobileCompact
+                    ? (placeholder ?? (bottomHint as string | undefined) ?? sendboxHint)
+                    : placeholder
+                      ? `${placeholder}  ${bottomHint ?? sendboxHint}`
+                      : ((bottomHint as string | undefined) ?? sendboxHint)
               }
               className={`${shouldUseHighlightOverlay ? 'sendbox-highlight-textarea ' : ''}ps-0 pe-0 !b-none focus:shadow-none m-0 !bg-transparent !focus:bg-transparent !hover:bg-transparent lh-[20px] !resize-none text-14px ${isMobile ? 'sendbox-input--mobile' : ''}`}
               data-testid='sendbox-input'

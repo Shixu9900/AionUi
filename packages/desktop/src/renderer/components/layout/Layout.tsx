@@ -17,6 +17,7 @@ import { setGlobalNavigate } from '@/renderer/utils/navigation';
 import { usePreviewContext } from '@renderer/pages/conversation/Preview';
 import { ProjectPanelHost } from '@renderer/components/layout/ProjectPanelHost';
 import { ProjectPanelMobileOverlay } from '@renderer/components/layout/ProjectPanelMobileOverlay';
+import { RecordsReviewHost } from '@renderer/components/layout/RecordsReviewHost';
 import { setCurrentProject, useCurrentProject } from '@renderer/pages/conversation/explorer/currentProjectStore';
 import { setCurrentConversation } from '@renderer/pages/conversation/explorer/currentConversationStore';
 import { useContainerWidth } from '@renderer/pages/conversation/hooks/useContainerWidth';
@@ -405,12 +406,7 @@ const Layout: React.FC<{
                 )}
               >
                 {collapsed ? (
-                  <img
-                    src={asiIcon}
-                    alt='ASI'
-                    className='asi-brand-mark shrink-0 size-24px'
-                    onClick={onClick}
-                  />
+                  <img src={asiIcon} alt='ASI' className='asi-brand-mark shrink-0 size-24px' onClick={onClick} />
                 ) : isSettingsRoute ? (
                   <Tooltip content={t('common.back', { defaultValue: 'Back to Chat' })} position='bottom'>
                     <img
@@ -548,6 +544,7 @@ const Layout: React.FC<{
                 />
               )}
             </div>
+            {!isMobile && <RecordsReviewHost viewportWidth={viewportWidth} />}
 
             {/* Mobile overlay: backdrop + fixed panel + floating collapse handle. */}
             {isMobile && Boolean(currentProject) && (

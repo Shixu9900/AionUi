@@ -1414,5 +1414,7 @@
   "crossSessionMessageDesc": "Erlaubt Agenten, Nachrichten an Ihre anderen Unterhaltungen zu senden. Beim Ausschalten wird auch die @@-Erwähnung im Eingabefeld deaktiviert.",
   "crossSessionMessageDisabledBanner": "Nachrichten zwischen Unterhaltungen sind aus, die @@-Erwähnung ist nicht verfügbar.",
   "crossSessionMessageResume": "Wieder einschalten",
-  "crossSessionMessageUpdateFailed": "Einstellung konnte nicht aktualisiert werden"
+  "crossSessionMessageUpdateFailed": "Einstellung konnte nicht aktualisiert werden",
+  "engineerMode": "Engineer mode",
+  "engineerModeDesc": "Hide developer features (agent engine picker, permission modes, skills and MCP, slash-command hints, scheduled tasks, teams) and keep only chat, files and review results"
 }

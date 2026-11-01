@@ -19,6 +19,8 @@ interface SiderToolbarProps {
   siderTooltipProps: SiderTooltipProps;
   onNewChat: () => void;
   onToggleBatchMode: () => void;
+  /** Overrides the "new conversation" label; also hides batch management. */
+  newLabel?: string;
 }
 
 const SiderToolbar: React.FC<SiderToolbarProps> = ({
@@ -28,13 +30,15 @@ const SiderToolbar: React.FC<SiderToolbarProps> = ({
   siderTooltipProps,
   onNewChat,
   onToggleBatchMode,
+  newLabel,
 }) => {
   const { t } = useTranslation();
+  const label = newLabel ?? t('conversation.welcome.newConversation');
 
   if (collapsed) {
     return (
       <div className='shrink-0 flex flex-col items-center gap-2px w-full'>
-        <Tooltip {...siderTooltipProps} content={t('conversation.welcome.newConversation')} position='right'>
+        <Tooltip {...siderTooltipProps} content={label} position='right'>
           <div
             className={classNames(
               'w-full h-34px flex items-center justify-center cursor-pointer transition-colors text-t-primary rd-8px hover:bg-fill-3 active:bg-fill-4',
@@ -57,7 +61,7 @@ const SiderToolbar: React.FC<SiderToolbarProps> = ({
 
   return (
     <div className='shrink-0 flex items-center gap-8px'>
-      <Tooltip {...siderTooltipProps} content={t('conversation.welcome.newConversation')} position='right'>
+      <Tooltip {...siderTooltipProps} content={label} position='right'>
         <div
           className={classNames(
             styles.newChatTrigger,
@@ -75,30 +79,30 @@ const SiderToolbar: React.FC<SiderToolbarProps> = ({
               style={{ lineHeight: 0 }}
             />
           </span>
-          <span className='collapsed-hidden text-t-primary text-14px font-[500] leading-24px'>
-            {t('conversation.welcome.newConversation')}
-          </span>
+          <span className='collapsed-hidden text-t-primary text-14px font-[500] leading-24px'>{label}</span>
         </div>
       </Tooltip>
-      <Tooltip
-        {...siderTooltipProps}
-        content={isBatchMode ? t('conversation.history.batchModeExit') : t('conversation.history.batchManage')}
-        position='right'
-      >
-        <div
-          className={classNames(
-            'size-26px rd-6px flex items-center justify-center cursor-pointer shrink-0 transition-colors border border-solid border-transparent text-t-secondary hover:text-t-primary',
-            isMobile && 'sider-action-icon-btn-mobile',
-            {
-              'hover:bg-fill-3': !isBatchMode,
-              'bg-[rgba(var(--primary-6),0.12)] border-[rgba(var(--primary-6),0.24)] !text-primary': isBatchMode,
-            }
-          )}
-          onClick={onToggleBatchMode}
+      {newLabel === undefined && (
+        <Tooltip
+          {...siderTooltipProps}
+          content={isBatchMode ? t('conversation.history.batchModeExit') : t('conversation.history.batchManage')}
+          position='right'
         >
-          <ListCheckbox theme='outline' size='14' className='block leading-none shrink-0' style={{ lineHeight: 0 }} />
-        </div>
-      </Tooltip>
+          <div
+            className={classNames(
+              'size-26px rd-6px flex items-center justify-center cursor-pointer shrink-0 transition-colors border border-solid border-transparent text-t-secondary hover:text-t-primary',
+              isMobile && 'sider-action-icon-btn-mobile',
+              {
+                'hover:bg-fill-3': !isBatchMode,
+                'bg-[rgba(var(--primary-6),0.12)] border-[rgba(var(--primary-6),0.24)] !text-primary': isBatchMode,
+              }
+            )}
+            onClick={onToggleBatchMode}
+          >
+            <ListCheckbox theme='outline' size='14' className='block leading-none shrink-0' style={{ lineHeight: 0 }} />
+          </div>
+        </Tooltip>
+      )}
     </div>
   );
 };
