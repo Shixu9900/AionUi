@@ -325,7 +325,7 @@ const CreateWorkflowPage: React.FC = () => {
       <main className={styles.chat}>
         <div className={styles.chatHead}>
           <span className={styles.chatTitle}>第 {currentStage + 1} 步：{STAGES[currentStage].title}</span>
-          <span className={styles.stageHint}>说话、打字都可以；要交文件，点输入框里的回形针。</span>
+          <span className={styles.stageHint}>想说话：点一下输入框，连按两下 Fn 键开始听写，再按一下 Fn 结束。要交文件，点输入框里的回形针。</span>
         </div>
         <div className={styles.chatBody}>
           {conversation ? (
