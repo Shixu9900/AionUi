@@ -5,17 +5,19 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, Input } from '@arco-design/web-react';
 import classNames from 'classnames';
 import type { WorkflowDraft, WorkflowDraftRunItem } from '@/common/types/createWorkflow';
-import { STAGES, stageIndex } from './stages';
+import type { I18nKey } from '@/renderer/services/i18n';
+import { STAGES, stageHintKey, stageIndex, stageTitleKey } from './stages';
 import styles from './index.module.css';
 
-const FEEDBACK_GROUPS: { key: 'missing' | 'extra' | 'duplicate' | 'unclear'; title: string }[] = [
-  { key: 'missing', title: '我觉得缺了' },
-  { key: 'extra', title: '可能多余' },
-  { key: 'duplicate', title: '好像重复了' },
-  { key: 'unclear', title: '我还没听懂' },
+const FEEDBACK_GROUPS: { key: 'missing' | 'extra' | 'duplicate' | 'unclear'; titleKey: I18nKey }[] = [
+  { key: 'missing', titleKey: 'guid.createWorkflow.feedback.missing' },
+  { key: 'extra', titleKey: 'guid.createWorkflow.feedback.extra' },
+  { key: 'duplicate', titleKey: 'guid.createWorkflow.feedback.duplicate' },
+  { key: 'unclear', titleKey: 'guid.createWorkflow.feedback.unclear' },
 ];
 
 export const nonEmpty = (list: string[] | undefined) => (list ?? []).filter((item) => item.trim().length > 0);
@@ -38,6 +40,7 @@ export const TeachGuide: React.FC<{
   onSave: () => void;
   onCreateAssistant: () => void;
 }> = ({ draft, deliver, onVerdict, onSave, onCreateAssistant }) => {
+  const { t } = useTranslation();
   const current = stageIndex(draft.stage);
   const stage = STAGES[current];
   const [expanded, setExpanded] = useState(true);
@@ -48,7 +51,7 @@ export const TeachGuide: React.FC<{
   const questions = (draft.questions ?? []).filter((q) => q.status !== 'answered' && q.text.trim());
   const feedback = FEEDBACK_GROUPS.map((group) => ({
     key: group.key,
-    title: group.title,
+    title: t(group.titleKey),
     items: nonEmpty(draft.feedback?.[group.key]),
   })).filter((group) => group.items.length > 0);
   const files = draft.files ?? [];
@@ -69,7 +72,7 @@ export const TeachGuide: React.FC<{
               [styles.stagePillNow]: index === current,
             })}
           >
-            {index < current ? '✓' : index + 1} {item.title}
+            {index < current ? '✓' : index + 1} {t(stageTitleKey(item.id))}
           </li>
         ))}
       </ol>
@@ -78,14 +81,14 @@ export const TeachGuide: React.FC<{
         <div className='flex items-start justify-between gap-12px'>
           <div className='min-w-0'>
             <div className={styles.guideStage}>
-              现在：第 {current + 1} 步 · {stage.title}
-              <span className={styles.guideHint}>{stage.hint}</span>
+              {t('guid.createWorkflow.now', { n: current + 1, title: t(stageTitleKey(stage.id)) })}
+              <span className={styles.guideHint}>{t(stageHintKey(stage.id))}</span>
             </div>
             {draft.say && <div className={styles.guideSay}>{draft.say}</div>}
           </div>
           {hasDetail && (
             <Button size='mini' type='text' onClick={() => setExpanded((value) => !value)}>
-              {expanded ? '收起' : '展开'}
+              {expanded ? t('guid.createWorkflow.collapse') : t('guid.createWorkflow.expand')}
             </Button>
           )}
         </div>
@@ -94,7 +97,7 @@ export const TeachGuide: React.FC<{
           <div className={styles.guideDetail}>
             {questions.length > 0 && (
               <div>
-                <div className={styles.sectionLabel}>它在等你回答</div>
+                <div className={styles.sectionLabel}>{t('guid.createWorkflow.waiting')}</div>
                 <ol className={styles.plainList}>
                   {questions.map((question) => (
                     <li key={question.id}>{question.text}</li>
@@ -117,13 +120,15 @@ export const TeachGuide: React.FC<{
             {showFiles && (
               <div>
                 <div className={styles.sectionLabel}>
-                  需要的文件（缺 {files.filter((file) => file.status !== 'received').length} 份）· 点输入框里的回形针交给它
+                  {t('guid.createWorkflow.filesNeeded', {
+                    count: files.filter((file) => file.status !== 'received').length,
+                  })}
                 </div>
                 <div className='flex flex-col gap-6px'>
                   {files.map((file) => (
                     <div key={file.id} className={styles.fileItem}>
                       <span className={classNames(styles.fileMark, { [styles.fileMarkDone]: file.status === 'received' })}>
-                        {file.status === 'received' ? '✓' : '缺'}
+                        {file.status === 'received' ? '✓' : t('guid.createWorkflow.missingMark')}
                       </span>
                       <div className='flex-1 min-w-0'>
                         <div className={styles.fileName}>{file.name}</div>
@@ -138,7 +143,7 @@ export const TeachGuide: React.FC<{
             {showRun && (
               <div>
                 <div className={styles.sectionLabel}>
-                  它照做的结果：逐条点「对」或「不对」，不对的写正确答案，然后在下面告诉它「批改完了」
+                  {t('guid.createWorkflow.runHint')}
                 </div>
                 <div className='flex flex-col gap-8px'>
                   {run.map((item) => (
@@ -151,19 +156,19 @@ export const TeachGuide: React.FC<{
             {showDeliver && (
               <div>
                 <div className={styles.sectionLabel}>
-                  {deliver.workflowMd
-                    ? '工作方法已写好（右边可以看全文）。只含做法和判断规则，不带这套资料的数字和编号。'
-                    : '跟它说「可以交付了」，它会先写好工作方法。'}
+                  {deliver.workflowMd ? t('guid.createWorkflow.deliverReady') : t('guid.createWorkflow.deliverWait')}
                 </div>
                 <div className='flex flex-wrap gap-8px'>
                   <Button type='primary' disabled={!deliver.workflowMd} loading={deliver.busy} onClick={onSave}>
-                    {deliver.saved ? '已保存，再存一次' : '保存这份 SOP'}
+                    {deliver.saved ? t('guid.createWorkflow.saveAgain') : t('guid.createWorkflow.saveSop')}
                   </Button>
                   <Button disabled={!deliver.saved} loading={deliver.busy} onClick={onCreateAssistant}>
-                    {deliver.assistantCreated ? '已建好测试助手，再建一个' : '建一个测试助手试试'}
+                    {deliver.assistantCreated
+                      ? t('guid.createWorkflow.assistantAgain')
+                      : t('guid.createWorkflow.createAssistant')}
                   </Button>
                 </div>
-                {deliver.assistantCreated && <div className={styles.flowOk}>可以在左侧「助手」里找到它。</div>}
+                {deliver.assistantCreated && <div className={styles.flowOk}>{t('guid.createWorkflow.assistantFound')}</div>}
               </div>
             )}
           </div>
@@ -177,6 +182,7 @@ const RunCard: React.FC<{
   item: WorkflowDraftRunItem;
   onVerdict: (id: string, verdict: 'right' | 'wrong', correction: string) => void;
 }> = ({ item, onVerdict }) => {
+  const { t } = useTranslation();
   const [correction, setCorrection] = useState(item.correction ?? '');
   useEffect(() => {
     setCorrection(item.correction ?? '');
@@ -189,7 +195,7 @@ const RunCard: React.FC<{
       })}
     >
       <div className={styles.fileName}>{item.claim}</div>
-      {item.evidence && <div className={styles.flowSub}>依据：{item.evidence}</div>}
+      {item.evidence && <div className={styles.flowSub}>{t('guid.createWorkflow.evidence', { text: item.evidence })}</div>}
       <div className='flex gap-8px mt-8px'>
         <Button
           size='small'
@@ -197,7 +203,7 @@ const RunCard: React.FC<{
           status={item.verdict === 'right' ? 'success' : 'default'}
           onClick={() => onVerdict(item.id, 'right', '')}
         >
-          对
+          {t('guid.createWorkflow.right')}
         </Button>
         <Button
           size='small'
@@ -205,14 +211,14 @@ const RunCard: React.FC<{
           status={item.verdict === 'wrong' ? 'danger' : 'default'}
           onClick={() => onVerdict(item.id, 'wrong', correction)}
         >
-          不对
+          {t('guid.createWorkflow.wrong')}
         </Button>
       </div>
       {item.verdict === 'wrong' && (
         <Input.TextArea
           className='mt-8px'
           autoSize={{ minRows: 1, maxRows: 4 }}
-          placeholder='正确的应该是……，因为……'
+          placeholder={t('guid.createWorkflow.correctionPlaceholder')}
           value={correction}
           onChange={setCorrection}
           onBlur={() => {

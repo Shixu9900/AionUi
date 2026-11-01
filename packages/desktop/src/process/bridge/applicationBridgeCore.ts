@@ -14,6 +14,7 @@ import path from 'path';
 import { ipcBridge } from '@/common';
 import { createSkillFileService } from '@process/services/skills';
 import { createCreateWorkflowService } from '@process/services/createWorkflow/createWorkflowService';
+import { createKnowledgeFileService } from '@process/services/knowledge/knowledgeFileService';
 import { getSystemDir, ProcessEnv } from '@process/utils/initStorage';
 import { copyDirectoryRecursively, getConfigPath, getDataPath, resolveCliSafePath } from '@process/utils';
 
@@ -32,6 +33,10 @@ export function initApplicationBridgeCore(): void {
   ipcBridge.createWorkflow.readFile.provider(createWorkflowService.readFile);
   ipcBridge.createWorkflow.writeFile.provider(createWorkflowService.writeFile);
   ipcBridge.createWorkflow.publish.provider(createWorkflowService.publish);
+
+  const knowledgeFiles = createKnowledgeFileService();
+  ipcBridge.knowledgeBase.readFile.provider(knowledgeFiles.readFile);
+  ipcBridge.knowledgeBase.writeFile.provider(knowledgeFiles.writeFile);
 
   // application.systemInfo is served by the backend via HTTP; updateSystemInfo
   // and getPath below remain buildProvider (true IPC) because they need

@@ -12,6 +12,7 @@ const AgentSettings = React.lazy(() => import('@renderer/pages/settings/AgentSet
 const AgentRepairPage = React.lazy(() => import('@renderer/pages/settings/AgentSettings/AgentRepairPage'));
 const AssistantSettings = React.lazy(() => import('@renderer/pages/settings/AssistantSettings'));
 const CreateWorkflowPage = React.lazy(() => import('@renderer/pages/createWorkflow'));
+const KnowledgePage = React.lazy(() => import('@renderer/pages/knowledge'));
 const SkillsSettings = React.lazy(() => import('@renderer/pages/settings/SkillsSettings/SkillsHubSettings'));
 const SkillDetailPage = React.lazy(() => import('@renderer/pages/settings/SkillsSettings/SkillDetailPage'));
 const ToolsSettings = React.lazy(() => import('@renderer/pages/settings/ToolsSettings'));
@@ -86,6 +87,7 @@ const PanelRoute: React.FC<{ layout: React.ReactElement }> = ({ layout }) => {
           {CREATE_WORKFLOW_BUILD ? (
             <Route path='/create-workflow' element={withRouteFallback(CreateWorkflowPage)} />
           ) : null}
+          <Route path='/knowledge' element={withRouteFallback(KnowledgePage)} />
           {/* Assistants moved out of Settings to a top-level entry; keep a redirect
               so old deep links / back-nav still land on the new page. */}
           <Route path='/settings/assistants' element={<Navigate to='/assistants' replace />} />

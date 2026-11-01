@@ -5,6 +5,13 @@
  */
 
 import type { WorkflowDraftStage } from '@/common/types/createWorkflow';
+import type { I18nKey } from '@/renderer/services/i18n';
+
+export const stageTitleKey = (id: WorkflowDraftStage): I18nKey =>
+  `guid.createWorkflow.stage.${id}.title` as I18nKey;
+
+export const stageHintKey = (id: WorkflowDraftStage): I18nKey =>
+  `guid.createWorkflow.stage.${id}.hint` as I18nKey;
 
 export const STAGES: { id: WorkflowDraftStage; title: string; hint: string }[] = [
   { id: 'job', title: '这是什么工作', hint: '名称、谁来做、交给谁' },

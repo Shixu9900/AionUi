@@ -609,6 +609,7 @@ export const documents = {
     (p) => `/api/documents?project_id=${encodeURIComponent(p.project_id)}`
   ),
   scan: httpPost<StoredDocument[], { project_id: string; folder: string }>('/api/documents/scan'),
+  ingest: httpPost<StoredDocument, { project_id: string; path: string }>('/api/documents/ingest'),
   parse: httpPost<DocumentReport, { id: string }>((p) => `/api/documents/${p.id}/parse`),
   report: httpGet<DocumentReport, { id: string }>((p) => `/api/documents/${p.id}/report`),
   pages: httpGet<StoredPage[], { id: string }>((p) => `/api/documents/${p.id}/pages`),
@@ -850,6 +851,11 @@ export const dialog = {
 // drafts in the private aviator repo by absolute path (outside any project
 // sandbox), so this stays Electron-only like the skill-file channels below.
 // ---------------------------------------------------------------------------
+
+export const knowledgeBase = {
+  readFile: bridge.buildProvider<string, { relativePath: string }>('knowledgeBase.readFile'),
+  writeFile: bridge.buildProvider<boolean, { relativePath: string; data: string }>('knowledgeBase.writeFile'),
+};
 
 export const createWorkflow = {
   status: bridge.buildProvider<CreateWorkflowStatus, CreateWorkflowStatusRequest>('createWorkflow.status'),

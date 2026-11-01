@@ -1,0 +1,28 @@
+.entry {
+  box-sizing: border-box;
+  border: 1px solid var(--knowledge-border);
+  background: var(--knowledge-bg);
+  color: var(--knowledge-fg);
+  --knowledge-bg: #e8e9fb;
+  --knowledge-border: #6366f1;
+  --knowledge-fg: #312e81;
+}
+
+.entry:hover,
+.entry:active {
+  background: var(--knowledge-bg-hover);
+  --knowledge-bg-hover: #d9dcf8;
+}
+
+.entryActive {
+  background: var(--knowledge-bg-active);
+  --knowledge-bg-active: #c7ccf6;
+}
+
+:global([data-theme='dark']) .entry {
+  --knowledge-bg: #2a2d52;
+  --knowledge-border: #818cf8;
+  --knowledge-fg: #e0e7ff;
+  --knowledge-bg-hover: #343868;
+  --knowledge-bg-active: #3f467c;
+}

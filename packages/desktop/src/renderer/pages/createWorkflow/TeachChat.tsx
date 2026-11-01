@@ -5,6 +5,7 @@
  */
 
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ipcBridge } from '@/common';
 import type { IProvider, TChatConversation, TProviderWithModel } from '@/common/config/storage';
 import AionrsChat from '@renderer/pages/conversation/platforms/aionrs/AionrsChat';
@@ -17,6 +18,7 @@ export const TeachChat: React.FC<{ conversation: AionrsConversation; assistantId
   conversation,
   assistantId,
 }) => {
+  const { t } = useTranslation();
   const onSelectModel = useCallback(
     async (provider: IProvider, modelName: string) => {
       const selected = { ...provider, use_model: modelName } as TProviderWithModel;
@@ -32,10 +34,10 @@ export const TeachChat: React.FC<{ conversation: AionrsConversation; assistantId
       workspace={conversation.extra.workspace}
       modelSelection={modelSelection}
       session_mode={conversation.extra?.session_mode}
-      agent_name='徒弟'
+      agent_name={t('guid.createWorkflow.agentName')}
       assistantId={assistantId}
       loadedSkills={(conversation.extra as { skills?: string[] }).skills}
-      emptySlot={<div className={styles.chatEmpty}>徒弟正在准备第一个问题……</div>}
+      emptySlot={<div className={styles.chatEmpty}>{t('guid.createWorkflow.firstQuestion')}</div>}
     />
   );
 };

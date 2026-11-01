@@ -10,7 +10,14 @@ import { blurActiveElement } from '@renderer/utils/ui/focus';
 import { useThemeContext } from '@renderer/hooks/context/ThemeContext';
 import { useEngineerMode } from '@renderer/hooks/config/useEngineerMode';
 import { useCreateWorkflowMode } from '@renderer/hooks/config/useCreateWorkflowMode';
-import { SiderToolbar, SiderSearchEntry, SiderScheduledEntry, SiderAssistantEntry, SiderCreateWorkflowEntry } from './SiderNav';
+import {
+  SiderToolbar,
+  SiderSearchEntry,
+  SiderScheduledEntry,
+  SiderAssistantEntry,
+  SiderCreateWorkflowEntry,
+  SiderKnowledgeEntry,
+} from './SiderNav';
 import SiderFooter from './SiderFooter';
 import TeamSiderSection from './TeamSiderSection';
 import ProjectSider from './ProjectSider';
@@ -134,6 +141,19 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
     }
   };
 
+  const handleKnowledgeClick = () => {
+    cleanupSiderTooltips();
+    blurActiveElement();
+    closePreview();
+    setIsBatchMode(false);
+    Promise.resolve(navigate('/knowledge')).catch((error) => {
+      console.error('Navigation failed:', error);
+    });
+    if (onSessionClick) {
+      onSessionClick();
+    }
+  };
+
   const handleQuickThemeToggle = () => {
     void setTheme(theme === 'dark' ? 'light' : 'dark');
   };
@@ -244,6 +264,13 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
                 onClick={handleCreateWorkflowClick}
               />
             )}
+            <SiderKnowledgeEntry
+              isMobile={isMobile}
+              isActive={pathname.startsWith('/knowledge')}
+              collapsed={collapsed}
+              siderTooltipProps={siderTooltipProps}
+              onClick={handleKnowledgeClick}
+            />
             {/* Scheduled tasks nav entry - fixed above scroll */}
             {!engineerMode && (
               <SiderScheduledEntry
@@ -263,10 +290,12 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
             />
             {/* Scrollable content: pinned → team (slot) → projects → conversations */}
             <div className={classNames('flex-1 min-h-0 overflow-y-auto', siderStyles.scrollArea)}>
-              {pathname.startsWith('/create-workflow') ? (
+              {pathname.startsWith('/create-workflow') || pathname.startsWith('/knowledge') ? (
                 collapsed ? null : (
                   <div className='px-12px py-10px text-12px leading-18px text-t-secondary'>
-                    「创建工作流」是独立的专家工作台，不读取也不显示任何用户项目。
+                    {pathname.startsWith('/knowledge')
+                      ? t('guid.knowledge.note')
+                      : t('guid.createWorkflow.note')}
                   </div>
                 )
               ) : engineerMode ? (

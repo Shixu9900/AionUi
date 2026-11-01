@@ -5,6 +5,7 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import NavigatedViewer from 'bpmn-js/lib/NavigatedViewer';
 import { layoutProcess } from 'bpmn-auto-layout';
 import 'bpmn-js/dist/assets/diagram-js.css';
@@ -54,11 +55,16 @@ const markerOf = (step: WorkflowDraftStep): string | null => {
 
 /** Read-only BPMN view of the draft steps; the bpmn.io watermark must stay visible (bpmn-js license). */
 const BpmnFlow: React.FC<{ steps: WorkflowDraftStep[]; height: number }> = ({ steps, height }) => {
+  const { t } = useTranslation();
   const hostRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<NavigatedViewer | null>(null);
   const [renderMs, setRenderMs] = useState<number | null>(null);
   const [error, setError] = useState('');
-  const xml = draftToBpmn(steps);
+  const xml = draftToBpmn(steps, {
+    start: t('guid.createWorkflow.bpmnStart'),
+    end: t('guid.createWorkflow.bpmnEnd'),
+    otherwise: t('guid.createWorkflow.bpmnOtherwise'),
+  });
   const stepsRef = useRef(steps);
   stepsRef.current = steps;
 
@@ -104,7 +110,11 @@ const BpmnFlow: React.FC<{ steps: WorkflowDraftStep[]; height: number }> = ({ st
     <div className={styles.bpmnWrap}>
       <div ref={hostRef} className={styles.bpmnHost} style={{ height }} />
       <div className={styles.bpmnMeta}>
-        {error ? `流程图没画出来：${error}` : renderMs !== null ? `按住拖动看后面的步骤，滚轮缩放 · 画图用时 ${renderMs} 毫秒` : '正在画图……'}
+        {error
+          ? t('guid.createWorkflow.bpmnFailed', { error })
+          : renderMs !== null
+            ? t('guid.createWorkflow.bpmnHint', { ms: renderMs })
+            : t('guid.createWorkflow.bpmnDrawing')}
       </div>
     </div>
   );

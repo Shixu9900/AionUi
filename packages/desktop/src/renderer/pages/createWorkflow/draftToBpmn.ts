@@ -25,9 +25,12 @@ type Flow = { id: string; from: string; to: string; name?: string };
  * Layout is left to bpmn-auto-layout so the agent never has to emit XML;
  * the layouter walks explicit <incoming>/<outgoing> refs, so every node lists them.
  */
-export const draftToBpmn = (steps: WorkflowDraftStep[]): string => {
+export const draftToBpmn = (
+  steps: WorkflowDraftStep[],
+  chrome: { start: string; end: string; otherwise: string } = { start: '开始', end: '完成', otherwise: '其余情况' }
+): string => {
   const indexOf = new Map(steps.map((step, index) => [step.id, index]));
-  const nodes: Node[] = [{ id: 'Start', tag: 'startEvent', name: '开始' }];
+  const nodes: Node[] = [{ id: 'Start', tag: 'startEvent', name: chrome.start }];
   const flows: Flow[] = [];
   const flow = (from: string, to: string, name?: string) => {
     flows.push({ id: `Flow_${flows.length + 1}`, from, to, name });
@@ -58,9 +61,9 @@ export const draftToBpmn = (steps: WorkflowDraftStep[]): string => {
       seen.add(key);
       flow(gateway, target, shorten(branch.when));
     });
-    if (!reachesNext) flow(gateway, targetOf(index + 1), '其余情况');
+    if (!reachesNext) flow(gateway, targetOf(index + 1), chrome.otherwise);
   });
-  nodes.push({ id: 'End', tag: 'endEvent', name: '完成' });
+  nodes.push({ id: 'End', tag: 'endEvent', name: chrome.end });
 
   const nodeXml = nodes.map((node) => {
     const name = node.name ? ` name="${escapeXml(node.name)}"` : '';

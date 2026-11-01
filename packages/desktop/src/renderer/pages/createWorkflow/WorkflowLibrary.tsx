@@ -5,10 +5,12 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, Input, Tag } from '@arco-design/web-react';
 import { useNavigate } from 'react-router-dom';
+import type { TFunction } from 'i18next';
 import type { WorkflowDraft, WorkflowTeachSession } from '@/common/types/createWorkflow';
-import { STAGES, stageIndex } from './stages';
+import { STAGES, stageIndex, stageTitleKey } from './stages';
 import { deliverDirOf, parseDraft, readText } from './workflowFiles';
 import styles from './index.module.css';
 
@@ -16,10 +18,11 @@ type CardInfo = { draft: WorkflowDraft | null; hasMethod: boolean; delivered: bo
 
 /** Leaves the SOP creator for the default workbench. Shown at the top-right of every creator view. */
 export const BackToWorkbench: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   return (
     <Button className={styles.homeButton} onClick={() => void navigate('/guid')}>
-      回到工作台
+      {t('guid.createWorkflow.back')}
     </Button>
   );
 };
@@ -29,10 +32,10 @@ const formatDate = (ms: number) => {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 };
 
-const statusOf = (info: CardInfo | undefined): { label: string; color: string } => {
-  if (info?.delivered) return { label: '已交付', color: 'green' };
-  if (info?.hasMethod) return { label: '方法已写好，待保存', color: 'arcoblue' };
-  return { label: '教学中', color: 'orange' };
+const statusOf = (info: CardInfo | undefined, t: TFunction): { label: string; color: string } => {
+  if (info?.delivered) return { label: t('guid.createWorkflow.status.delivered'), color: 'green' };
+  if (info?.hasMethod) return { label: t('guid.createWorkflow.status.ready'), color: 'arcoblue' };
+  return { label: t('guid.createWorkflow.status.teaching'), color: 'orange' };
 };
 
 export const WorkflowLibrary: React.FC<{
@@ -41,6 +44,7 @@ export const WorkflowLibrary: React.FC<{
   onOpen: (session: WorkflowTeachSession) => void;
   onCreate: (jobName: string) => void;
 }> = ({ items, starting, onOpen, onCreate }) => {
+  const { t } = useTranslation();
   const [jobName, setJobName] = useState('');
   const [infos, setInfos] = useState<Record<string, CardInfo>>({});
 
@@ -75,40 +79,36 @@ export const WorkflowLibrary: React.FC<{
       </div>
       <div className={styles.library}>
         <div className={styles.brandRow}>
-          <h1 className={styles.title}>工作流SOP创建器 — YESIFU</h1>
-          <Tag color='orange'>管理团队专用</Tag>
+          <h1 className={styles.title}>{t('guid.createWorkflow.title')}</h1>
+          <Tag color='orange'>{t('guid.createWorkflow.badge')}</Tag>
         </div>
-        <p className={styles.lead}>
-          你是行业里的师傅。YESIFU 让你把一项工作怎么做，教会这个 AI
-          徒弟。它问、你讲，边听边画出流程，再拿一套真实资料照做一遍请你批改，直到你说学会了，练成一份
-          SOP。每一份 SOP 的对话、流程图、资料和交付结果都记在它自己名下。
-        </p>
+        <p className={styles.lead}>{t('guid.createWorkflow.lead')}</p>
 
         <div className={styles.newCard}>
-          <div className={styles.sectionLabel}>教一项新工作</div>
+          <div className={styles.sectionLabel}>{t('guid.createWorkflow.newJob')}</div>
           <div className='flex gap-10px'>
             <Input
               size='large'
               value={jobName}
               onChange={setJobName}
               onPressEnter={create}
-              placeholder='这项工作叫什么？例如：APU 寿命件履历审查'
+              placeholder={t('guid.createWorkflow.jobPlaceholder')}
             />
             <Button type='primary' size='large' loading={starting} disabled={!jobName.trim()} onClick={create}>
-              开始教
+              {t('guid.createWorkflow.start')}
             </Button>
           </div>
         </div>
 
-        <div className={styles.sectionLabel}>已有的 SOP（{items.length}）</div>
+        <div className={styles.sectionLabel}>{t('guid.createWorkflow.existing', { count: items.length })}</div>
         {items.length === 0 ? (
-          <div className={styles.flowEmpty}>还没有 SOP。在上面写下第一项工作的名字就能开始。</div>
+          <div className={styles.flowEmpty}>{t('guid.createWorkflow.empty')}</div>
         ) : (
           <div className={styles.libraryGrid}>
             {items.map((item) => {
               const info = infos[item.relativeDir];
               const stage = stageIndex(info?.draft?.stage);
-              const status = statusOf(info);
+              const status = statusOf(info, t);
               const stepCount = info?.draft?.steps?.length ?? 0;
               return (
                 <button key={item.relativeDir} type='button' className={styles.libraryCard} onClick={() => onOpen(item)}>
@@ -127,12 +127,16 @@ export const WorkflowLibrary: React.FC<{
                     ))}
                   </div>
                   <div className={styles.flowSub}>
-                    第 {stage + 1} / {STAGES.length} 步：{STAGES[stage].title}
-                    {stepCount > 0 ? ` · 已梳理 ${stepCount} 步` : ''}
+                    {t('guid.createWorkflow.libraryProgress', {
+                      current: stage + 1,
+                      total: STAGES.length,
+                      title: t(stageTitleKey(STAGES[stage].id)),
+                    })}
+                    {stepCount > 0 ? t('guid.createWorkflow.stepsNoted', { count: stepCount }) : ''}
                   </div>
                   <div className={styles.flowSub}>
                     {info?.draft?.job?.who ? `${info.draft.job.who} · ` : ''}
-                    {formatDate(item.createdAt)} 开始
+                    {t('guid.createWorkflow.startedOn', { date: formatDate(item.createdAt) })}
                   </div>
                 </button>
               );

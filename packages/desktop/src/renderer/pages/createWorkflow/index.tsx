@@ -5,6 +5,7 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, Message } from '@arco-design/web-react';
 import { ipcBridge } from '@/common';
 import type { TChatConversation } from '@/common/config/storage';
@@ -46,6 +47,7 @@ const skillFromWorkflow = (skillName: string, job: string, workflowMd: string) =
   `---\nname: ${skillName}\ndescription: ${job}。由专家在「创建工作流」中教会并确认的工作方法。只含做法和判断规则。\n---\n\n${workflowMd}\n`;
 
 const CreateWorkflowPage: React.FC = () => {
+  const { t } = useTranslation();
   const { current_model } = useGuidModelSelection();
   const [library, setLibrary] = useState<WorkflowTeachSession[] | null>(null);
   const [session, setSession] = useState<WorkflowTeachSession | null>(null);
@@ -113,7 +115,7 @@ const CreateWorkflowPage: React.FC = () => {
     if (existing) return existing.id;
     const created = await ipcBridge.assistants.create.invoke({
       name: MASTER_NAME,
-      description: 'YESIFU 的 AI 徒弟：跟行业师傅学一项工作，整理成助手能照做的 SOP。管理团队专用。',
+      description: t('guid.createWorkflow.masterDescription'),
       enabled_skills: [MASTER_SKILL],
     });
     return created.id;
@@ -121,7 +123,7 @@ const CreateWorkflowPage: React.FC = () => {
 
   const startSession = async (job: string) => {
     if (!current_model) {
-      Message.warning('还没有可用的模型，请先在设置里配置一个模型。');
+      Message.warning(t('guid.createWorkflow.noModel'));
       return;
     }
     setStarting(true);
@@ -133,7 +135,7 @@ const CreateWorkflowPage: React.FC = () => {
       const initialDraft: WorkflowDraft = { schema: 'aviator.workflow-draft/v1', stage: 'job', job: { name: job } };
       await writeText(`${relativeDir}/draft.json`, JSON.stringify(initialDraft, null, 2));
       const created = await ipcBridge.conversation.create.invoke({
-        name: `创建工作流 · ${job}`,
+        name: t('guid.createWorkflow.conversationName', { job }),
         model: current_model,
         assistant: {
           id: assistantId,
@@ -147,7 +149,7 @@ const CreateWorkflowPage: React.FC = () => {
         extra: { workspace: sessionDir, custom_workspace: true, default_files: [] },
       });
       if (!created?.id) {
-        Message.error('没能开始对话，请稍后再试。');
+        Message.error(t('guid.createWorkflow.startFailed'));
         return;
       }
       sessionStorage.setItem(`aionrs_initial_message_${created.id}`, JSON.stringify({ input: kickoff(job) }));
@@ -165,7 +167,7 @@ const CreateWorkflowPage: React.FC = () => {
       openSession(next);
     } catch (error) {
       console.error('[createWorkflow] start failed', error);
-      Message.error('没能开始对话，请稍后再试。');
+      Message.error(t('guid.createWorkflow.startFailed'));
     } finally {
       setStarting(false);
     }
@@ -199,7 +201,7 @@ const CreateWorkflowPage: React.FC = () => {
         ),
       ]);
       setDeliver((prev) => ({ ...prev, saved: true }));
-      Message.success('这份 SOP 已保存。');
+      Message.success(t('guid.createWorkflow.saved'));
     } finally {
       setDeliver((prev) => ({ ...prev, busy: false }));
     }
@@ -211,8 +213,8 @@ const CreateWorkflowPage: React.FC = () => {
     try {
       await ipcBridge.fs.importSkill.invoke({ skill_path: `${WORKFLOWS_ROOT}/${deliverDirOf(session)}/skill` });
       await ipcBridge.assistants.create.invoke({
-        name: `${draft.job?.name ?? session.title}（测试）`,
-        description: '由「创建工作流」教会的工作方法生成，用来验证新助手能照着做。',
+        name: t('guid.createWorkflow.testName', { name: draft.job?.name ?? session.title }),
+        description: t('guid.createWorkflow.testDescription'),
         enabled_skills: [skillNameOf(session)],
       });
       setDeliver((prev) => ({ ...prev, assistantCreated: true }));
@@ -227,7 +229,7 @@ const CreateWorkflowPage: React.FC = () => {
         <div className={styles.homeBar}>
           <BackToWorkbench />
         </div>
-        <div className={styles.library}>正在打开……</div>
+        <div className={styles.library}>{t('guid.createWorkflow.opening')}</div>
       </div>
     );
   }
@@ -252,10 +254,10 @@ const CreateWorkflowPage: React.FC = () => {
       <main className={styles.chat}>
         <div className={styles.chatHead}>
           <Button size='small' type='text' onClick={backToLibrary}>
-            ← 返回
+            {t('guid.createWorkflow.backToList')}
           </Button>
           <span className={styles.chatTitle}>{draft.job?.name || session.title}</span>
-          <span className={styles.guideHint}>想说话：点一下输入框，连按两下 Fn 开始听写，再按一下 Fn 结束</span>
+          <span className={styles.guideHint}>{t('guid.createWorkflow.dictateHint')}</span>
         </div>
         <TeachGuide
           draft={draft}
@@ -268,7 +270,7 @@ const CreateWorkflowPage: React.FC = () => {
           {conversation ? (
             <TeachChat conversation={conversation} assistantId={session.assistantId} />
           ) : (
-            <div className={styles.chatEmpty}>徒弟正在准备……</div>
+            <div className={styles.chatEmpty}>{t('guid.createWorkflow.preparing')}</div>
           )}
         </div>
       </main>

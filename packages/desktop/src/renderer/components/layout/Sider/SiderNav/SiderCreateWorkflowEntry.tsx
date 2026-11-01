@@ -8,6 +8,7 @@
 // special button on both light and dark sider backgrounds — a yellow glyph
 // alone disappears on white.
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Tooltip } from '@arco-design/web-react';
 import { Branch } from '@icon-park/react';
 import classNames from 'classnames';
@@ -29,7 +30,8 @@ const SiderCreateWorkflowEntry: React.FC<SiderCreateWorkflowEntryProps> = ({
   siderTooltipProps,
   onClick,
 }) => {
-  const label = '创建工作流';
+  const { t } = useTranslation();
+  const label = t('guid.createWorkflow.nav');
   const plate = classNames(
     styles.entry,
     isActive && styles.entryActive,

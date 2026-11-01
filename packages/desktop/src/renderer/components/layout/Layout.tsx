@@ -159,7 +159,9 @@ const Layout: React.FC<{
   const isSettingsRoute = location.pathname.startsWith('/settings');
   // 创建工作流 is a standalone full-width page: no project workbench, preview or explorer.
   const isCreateWorkflowRoute = location.pathname.startsWith('/create-workflow');
-  const engineerWorkbench = useEngineerMode() && !isSettingsRoute && !isCreateWorkflowRoute;
+  const isKnowledgeRoute = location.pathname.startsWith('/knowledge');
+  const isFullWidthRoute = isCreateWorkflowRoute || isKnowledgeRoute;
+  const engineerWorkbench = useEngineerMode() && !isSettingsRoute && !isFullWidthRoute;
   // Only wired to the wordmark in the isSettingsRoute branch below, so the
   // "no-op outside settings" contract is enforced structurally — no internal
   // route guard needed (the chat-route wordmark is a plain, inert div).
@@ -495,7 +497,7 @@ const Layout: React.FC<{
                 {engineerWorkbench && <ProcessStrip />}
                 <div
                   className={
-                    engineerWorkbench || isCreateWorkflowRoute
+                    engineerWorkbench || isFullWidthRoute
                       ? 'flex-1 min-h-0 overflow-hidden flex flex-col'
                       : 'contents'
                   }
@@ -511,7 +513,7 @@ const Layout: React.FC<{
               {/* Hoisted preview region (project conversations only). Structurally
                   persistent: lives above the per-conversation subtree, so a
                   same-project conversation switch does not remount it. */}
-              {!engineerWorkbench && !isCreateWorkflowRoute && previewRegionActive && (
+              {!engineerWorkbench && !isFullWidthRoute && previewRegionActive && (
                 <div
                   data-project-preview-region
                   className='preview-panel flex flex-col relative overflow-visible'
@@ -551,7 +553,7 @@ const Layout: React.FC<{
                   </div>
                 </div>
               )}
-              {!engineerWorkbench && !isCreateWorkflowRoute && !isMobile && (
+              {!engineerWorkbench && !isFullWidthRoute && !isMobile && (
                 <ProjectPanelHost
                   widthPx={explorerWidthPx}
                   collapsed={explorerCollapsed}
@@ -562,12 +564,12 @@ const Layout: React.FC<{
                 />
               )}
             </div>
-            {!engineerWorkbench && !isCreateWorkflowRoute && !isMobile && (
+            {!engineerWorkbench && !isFullWidthRoute && !isMobile && (
               <RecordsReviewHost viewportWidth={viewportWidth} />
             )}
 
             {/* Mobile overlay: backdrop + fixed panel + floating collapse handle. */}
-            {isMobile && !isCreateWorkflowRoute && Boolean(currentProject) && (
+            {isMobile && !isFullWidthRoute && Boolean(currentProject) && (
               <ProjectPanelMobileOverlay
                 projectId={currentProject as string}
                 collapsed={explorerCollapsed}
