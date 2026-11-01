@@ -68,3 +68,49 @@ export interface CreateWorkflowPublishResult {
   log: string;
   error?: string;
 }
+
+export type WorkflowDraftStage = 'job' | 'goal' | 'method' | 'confirm' | 'evidence' | 'run' | 'review' | 'deliver';
+
+export interface WorkflowDraftStep {
+  id: string;
+  title: string;
+  kind?: 'do' | 'check' | 'output';
+  look_at?: string[];
+  result?: string;
+  branches?: { when: string; goto?: string }[];
+  from?: 'expert' | 'suggested';
+}
+
+export interface WorkflowDraftRunItem {
+  id: string;
+  step?: string;
+  claim: string;
+  evidence?: string;
+  verdict?: 'pending' | 'right' | 'wrong';
+  correction?: string;
+}
+
+/** Written by the 工作流师傅 agent into its workspace each turn. */
+export interface WorkflowDraft {
+  schema?: string;
+  stage?: WorkflowDraftStage;
+  say?: string;
+  job?: { name?: string; who?: string; deliver_to?: string; frequency?: string };
+  goal?: { problem?: string; deliverable?: string; done_when?: string[]; wrong_when?: string[] };
+  steps?: WorkflowDraftStep[];
+  feedback?: { missing?: string[]; extra?: string[]; duplicate?: string[]; unclear?: string[] };
+  questions?: { id: string; text: string; status?: 'open' | 'answered' }[];
+  files?: { id: string; name: string; why?: string; status?: 'needed' | 'received' }[];
+  run?: WorkflowDraftRunItem[];
+  changes?: string[];
+}
+
+/** Pointer to the teaching session the page resumes. */
+export interface WorkflowTeachSession {
+  sessionDir: string;
+  relativeDir: string;
+  conversationId: string;
+  assistantId: string;
+  title: string;
+  createdAt: number;
+}
