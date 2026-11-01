@@ -71,13 +71,23 @@ export interface CreateWorkflowPublishResult {
 
 export type WorkflowDraftStage = 'job' | 'goal' | 'method' | 'confirm' | 'evidence' | 'run' | 'review' | 'deliver';
 
+export type WorkflowStepAuto = 'assistant' | 'assistant_with_review' | 'human';
+
 export interface WorkflowDraftStep {
   id: string;
   title: string;
   kind?: 'do' | 'check' | 'output';
+  /** Role (never a personal name) that does this step. */
+  actor?: string;
   look_at?: string[];
   result?: string;
   branches?: { when: string; goto?: string }[];
+  /** Mistake people commonly make at this step. */
+  pitfall?: string;
+  /** When to stop and ask someone instead of guessing. */
+  escalate?: string;
+  /** Who can carry the step out once deployed. */
+  auto?: WorkflowStepAuto;
   from?: 'expert' | 'suggested';
 }
 
@@ -95,11 +105,13 @@ export interface WorkflowDraft {
   schema?: string;
   stage?: WorkflowDraftStage;
   say?: string;
-  job?: { name?: string; who?: string; deliver_to?: string; frequency?: string };
+  job?: { name?: string; who?: string; deliver_to?: string; frequency?: string; trigger?: string };
   goal?: { problem?: string; deliverable?: string; done_when?: string[]; wrong_when?: string[] };
   steps?: WorkflowDraftStep[];
   feedback?: { missing?: string[]; extra?: string[]; duplicate?: string[]; unclear?: string[] };
   questions?: { id: string; text: string; status?: 'open' | 'answered' }[];
+  /** Where the work hurts today: time sinks, frequent errors, skipped checks. */
+  pain_points?: { text: string; step?: string }[];
   files?: { id: string; name: string; why?: string; status?: 'needed' | 'received' }[];
   run?: WorkflowDraftRunItem[];
   changes?: string[];

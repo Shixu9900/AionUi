@@ -493,7 +493,13 @@ const Layout: React.FC<{
                 }
               >
                 {engineerWorkbench && <ProcessStrip />}
-                <div className={engineerWorkbench ? 'flex-1 min-h-0 overflow-hidden flex flex-col' : 'contents'}>
+                <div
+                  className={
+                    engineerWorkbench || isCreateWorkflowRoute
+                      ? 'flex-1 min-h-0 overflow-hidden flex flex-col'
+                      : 'contents'
+                  }
+                >
                   <Outlet />
                   <PwaPullToRefresh />
                   <Suspense fallback={null}>

@@ -4,7 +4,9 @@
   --cw-accent-soft: rgba(var(--orange-6), 0.12);
   --cw-done: rgb(var(--green-6));
   --cw-line: var(--color-border-2);
-  height: 100%;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
   background: var(--bg-1);
   color: var(--color-text-1);
 }
@@ -288,33 +290,42 @@
 .flowCanvas {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
 }
 
-.flowCap {
-  padding: 3px 14px;
-  border-radius: 999px;
-  background: var(--color-fill-3);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--color-text-2);
+.bpmnWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.flowArrow {
-  position: relative;
-  width: 2px;
-  height: 16px;
-  background: var(--cw-accent);
+/* The diagram keeps a light canvas in dark mode: bpmn-js draws black strokes. */
+.bpmnHost {
+  width: 100%;
+  border: 1px solid var(--cw-line);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
 }
 
-.flowArrow::after {
-  content: '';
-  position: absolute;
-  left: -4px;
-  bottom: -1px;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 6px solid var(--cw-accent);
+.bpmnHost :global(.aviator-check .djs-visual > :nth-child(1)) {
+  fill: #fff4dc !important;
+  stroke: #c98a12 !important;
+}
+
+.bpmnHost :global(.aviator-output .djs-visual > :nth-child(1)) {
+  fill: #e6f6ec !important;
+  stroke: #2f9e5b !important;
+}
+
+.bpmnHost :global(.aviator-suggested .djs-visual > :nth-child(1)) {
+  stroke-dasharray: 6 4 !important;
+}
+
+.bpmnMeta {
+  font-size: 11px;
+  color: var(--color-text-3);
 }
 
 .flowNode {

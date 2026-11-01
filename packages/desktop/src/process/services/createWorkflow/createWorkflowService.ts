@@ -294,8 +294,14 @@ export function createCreateWorkflowService() {
       };
     },
 
+    /** Missing files read as ''; a thrown error would leave the bridge invoke unresolved forever. */
     async readFile({ relativePath }: CreateWorkflowFileRequest): Promise<string> {
-      return fs.readFile(resolveWorkflowPath(relativePath), 'utf8');
+      try {
+        return await fs.readFile(resolveWorkflowPath(relativePath), 'utf8');
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT') return '';
+        throw error;
+      }
     },
 
     async writeFile({ relativePath, data }: CreateWorkflowWriteRequest): Promise<boolean> {

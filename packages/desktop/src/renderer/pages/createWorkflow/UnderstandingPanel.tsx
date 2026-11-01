@@ -4,11 +4,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useEffect, useState } from 'react';
-import { Button, Input } from '@arco-design/web-react';
+import React, { Suspense, useEffect, useState } from 'react';
+import { Button, Input, Modal } from '@arco-design/web-react';
 import classNames from 'classnames';
-import type { WorkflowDraft, WorkflowDraftRunItem, WorkflowDraftStage } from '@/common/types/createWorkflow';
+import type {
+  WorkflowDraft,
+  WorkflowDraftRunItem,
+  WorkflowDraftStage,
+  WorkflowStepAuto,
+} from '@/common/types/createWorkflow';
 import styles from './index.module.css';
+
+/** bpmn-js is ~1 MB; split it out so only this page pays for it. */
+const BpmnFlow = React.lazy(() => import('./BpmnFlow'));
 
 type Tab = 'flow' | 'feedback' | 'files' | 'run' | 'deliver';
 
@@ -30,6 +38,12 @@ const FEEDBACK_GROUPS: { key: 'missing' | 'extra' | 'duplicate' | 'unclear'; tit
   { key: 'unclear', title: '我还没听懂' },
 ];
 
+const AUTO_LABEL: Record<WorkflowStepAuto, string> = {
+  assistant: '助手可以自己做',
+  assistant_with_review: '助手先做，专家复核',
+  human: '必须人来做',
+};
+
 const nonEmpty = (list: string[] | undefined) => (list ?? []).filter((item) => item.trim().length > 0);
 
 export type DeliverState = {
@@ -48,12 +62,18 @@ export const UnderstandingPanel: React.FC<{
 }> = ({ draft, deliver, onVerdict, onSave, onCreateAssistant }) => {
   const stage = draft.stage ?? 'job';
   const [tab, setTab] = useState<Tab>(TAB_FOR_STAGE[stage]);
+  const [flowZoomed, setFlowZoomed] = useState(false);
   useEffect(() => {
     setTab(TAB_FOR_STAGE[stage]);
   }, [stage]);
 
   const feedbackCount = FEEDBACK_GROUPS.reduce((sum, group) => sum + nonEmpty(draft.feedback?.[group.key]).length, 0);
   const openQuestions = (draft.questions ?? []).filter((q) => q.status !== 'answered');
+  const painPoints = (draft.pain_points ?? []).filter((point) => point.text.trim().length > 0);
+  const stepLabelOf = (stepId: string) => {
+    const index = (draft.steps ?? []).findIndex((step) => step.id === stepId);
+    return index < 0 ? stepId : `第 ${index + 1} 步`;
+  };
   const files = draft.files ?? [];
   const missingFiles = files.filter((file) => file.status !== 'received').length;
   const run = draft.run ?? [];
@@ -61,7 +81,7 @@ export const UnderstandingPanel: React.FC<{
 
   const tabs: { id: Tab; label: string; badge?: number }[] = [
     { id: 'flow', label: '它的理解' },
-    { id: 'feedback', label: '它的反馈', badge: feedbackCount + openQuestions.length },
+    { id: 'feedback', label: '它的反馈', badge: feedbackCount + openQuestions.length + painPoints.length },
     { id: 'files', label: '文件', badge: missingFiles },
     { id: 'run', label: '照做结果', badge: pendingRun },
     { id: 'deliver', label: '交付' },
@@ -69,7 +89,6 @@ export const UnderstandingPanel: React.FC<{
 
   const renderFlow = () => {
     const steps = draft.steps ?? [];
-    const titleOf = new Map(steps.map((step, index) => [step.id, `第 ${index + 1} 步`]));
     return (
       <>
         <section className={styles.goalCard}>
@@ -108,13 +127,34 @@ export const UnderstandingPanel: React.FC<{
           )}
         </section>
 
-        <div className={styles.sectionLabel}>流程图</div>
+        <div className='flex items-center justify-between'>
+          <div className={styles.sectionLabel}>流程图</div>
+          {steps.length > 0 && (
+            <Button size='mini' type='text' onClick={() => setFlowZoomed(true)}>
+              放大看
+            </Button>
+          )}
+        </div>
         {steps.length === 0 ? (
           <div className={styles.flowEmpty}>等你讲做法，这里会一步一步画出来。</div>
         ) : (
+          <Suspense fallback={<div className={styles.flowEmpty}>正在打开流程图……</div>}>
+            <BpmnFlow steps={steps} height={200} />
+            <Modal
+              title={draft.job?.name || '流程图'}
+              visible={flowZoomed}
+              footer={null}
+              style={{ width: '90vw' }}
+              onCancel={() => setFlowZoomed(false)}
+              unmountOnExit
+            >
+              <BpmnFlow steps={steps} height={Math.round(window.innerHeight * 0.5)} />
+            </Modal>
+          </Suspense>
+        )}
+        {steps.length > 0 && (
           <div className={styles.flowCanvas}>
-            <div className={styles.flowCap}>开始</div>
-            <div className={styles.flowArrow} />
+            <div className={styles.sectionLabel}>每一步看什么、得出什么</div>
             {steps.map((step, index) => (
               <React.Fragment key={step.id}>
                 <div
@@ -130,22 +170,23 @@ export const UnderstandingPanel: React.FC<{
                     {step.kind === 'check' && <span className={styles.flowBadge}>判断</span>}
                     {step.from === 'suggested' && <span className={styles.flowBadge}>它建议的</span>}
                   </div>
+                  {step.actor && <div className={styles.flowSub}>谁做：{step.actor}</div>}
                   {(step.look_at ?? []).length > 0 && (
                     <div className={styles.flowSub}>看：{(step.look_at ?? []).join('、')}</div>
                   )}
                   {step.result && <div className={styles.flowSub}>得出：{step.result}</div>}
+                  {step.pitfall && <div className={styles.flowSub}>容易错：{step.pitfall}</div>}
+                  {step.escalate && <div className={styles.flowSub}>拿不准就问：{step.escalate}</div>}
+                  {step.auto && <div className={styles.flowSub}>{AUTO_LABEL[step.auto]}</div>}
                   {(step.branches ?? []).map((branch) => (
                     <div key={branch.when} className={styles.flowBranch}>
                       {branch.when}
-                      {branch.goto ? ` → ${titleOf.get(branch.goto) ?? branch.goto}` : ''}
+                      {branch.goto ? ` → ${stepLabelOf(branch.goto)}` : ''}
                     </div>
                   ))}
                 </div>
-                {index < steps.length - 1 && <div className={styles.flowArrow} />}
               </React.Fragment>
             ))}
-            <div className={styles.flowArrow} />
-            <div className={styles.flowCap}>完成</div>
           </div>
         )}
         {(draft.changes ?? []).length > 0 && (
@@ -188,7 +229,18 @@ export const UnderstandingPanel: React.FC<{
           </section>
         );
       })}
-      {feedbackCount === 0 && openQuestions.length === 0 && (
+      {painPoints.length > 0 && (
+        <section className={styles.feedbackGroup}>
+          <div className={styles.sectionLabel}>现在最费劲、最容易出错的地方</div>
+          {painPoints.map((point) => (
+            <div key={point.text} className={styles.feedbackItem}>
+              {point.text}
+              {point.step ? `（${stepLabelOf(point.step)}）` : ''}
+            </div>
+          ))}
+        </section>
+      )}
+      {feedbackCount === 0 && openQuestions.length === 0 && painPoints.length === 0 && (
         <div className={styles.flowEmpty}>流程讲完后，它会在这里告诉你它觉得缺了什么、多了什么、哪里重复。</div>
       )}
     </>

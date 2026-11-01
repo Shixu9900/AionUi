@@ -29,11 +29,20 @@ const TEACH_PERMISSION = 'yolo';
 
 type AionrsConversation = Extract<TChatConversation, { type: 'aionrs' }>;
 
+/** A main process started before the createWorkflow bridge existed never answers; don't hang the page on it. */
+const READ_TIMEOUT_MS = 5000;
+
 const readText = async (relativePath: string): Promise<string | null> => {
+  let timer = 0;
+  const timeout = new Promise<null>((resolve) => {
+    timer = window.setTimeout(() => resolve(null), READ_TIMEOUT_MS);
+  });
   try {
-    return await ipcBridge.createWorkflow.readFile.invoke({ relativePath });
+    return await Promise.race([ipcBridge.createWorkflow.readFile.invoke({ relativePath }), timeout]);
   } catch {
     return null;
+  } finally {
+    window.clearTimeout(timer);
   }
 };
 
@@ -96,10 +105,7 @@ const CreateWorkflowPage: React.FC = () => {
 
   const pollDraft = useCallback(async () => {
     if (!session) return;
-    const [draftText, workflowMd] = await Promise.all([
-      readText(`${session.relativeDir}/draft.json`),
-      readText(`${session.relativeDir}/WORKFLOW.md`),
-    ]);
+    const draftText = await readText(`${session.relativeDir}/draft.json`);
     if (draftText && draftText !== draftTextRef.current) {
       const parsed = parseDraft(draftText);
       if (parsed) {
@@ -107,6 +113,7 @@ const CreateWorkflowPage: React.FC = () => {
         setDraft(parsed);
       }
     }
+    const workflowMd = await readText(`${session.relativeDir}/WORKFLOW.md`);
     setDeliver((prev) => (prev.workflowMd === (workflowMd ?? '') ? prev : { ...prev, workflowMd: workflowMd ?? '' }));
   }, [session]);
 
@@ -244,7 +251,13 @@ const CreateWorkflowPage: React.FC = () => {
 
   const currentStage = stageIndex(draft.stage);
 
-  if (!loaded) return <div className={styles.page} />;
+  if (!loaded) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.startCard}>正在打开创建工作流……</div>
+      </div>
+    );
+  }
 
   if (!session) {
     return (

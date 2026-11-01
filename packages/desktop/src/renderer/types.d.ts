@@ -78,3 +78,9 @@ declare module 'wavedrom/skins/dark.js' {
   const skin: import('wavedrom').WaveSkin;
   export default skin;
 }
+
+/** bpmn-auto-layout@1.3 ships no type declarations. */
+declare module 'bpmn-auto-layout' {
+  /** Adds diagram interchange (shape positions) to a BPMN XML that has none. */
+  export function layoutProcess(xml: string): Promise<string>;
+}
