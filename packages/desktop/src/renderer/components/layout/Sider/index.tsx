@@ -9,7 +9,8 @@ import { useLayoutContext } from '@renderer/hooks/context/LayoutContext';
 import { blurActiveElement } from '@renderer/utils/ui/focus';
 import { useThemeContext } from '@renderer/hooks/context/ThemeContext';
 import { useEngineerMode } from '@renderer/hooks/config/useEngineerMode';
-import { SiderToolbar, SiderSearchEntry, SiderScheduledEntry, SiderAssistantEntry } from './SiderNav';
+import { useCreateWorkflowMode } from '@renderer/hooks/config/useCreateWorkflowMode';
+import { SiderToolbar, SiderSearchEntry, SiderScheduledEntry, SiderAssistantEntry, SiderCreateWorkflowEntry } from './SiderNav';
 import SiderFooter from './SiderFooter';
 import TeamSiderSection from './TeamSiderSection';
 import ProjectSider from './ProjectSider';
@@ -27,6 +28,7 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
   const layout = useLayoutContext();
   const isMobile = layout?.isMobile ?? false;
   const engineerMode = useEngineerMode();
+  const createWorkflowMode = useCreateWorkflowMode();
   const { t } = useTranslation();
   const location = useLocation();
   const { pathname, search, hash } = location;
@@ -112,6 +114,19 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
     closePreview();
     setIsBatchMode(false);
     Promise.resolve(navigate('/assistants')).catch((error) => {
+      console.error('Navigation failed:', error);
+    });
+    if (onSessionClick) {
+      onSessionClick();
+    }
+  };
+
+  const handleCreateWorkflowClick = () => {
+    cleanupSiderTooltips();
+    blurActiveElement();
+    closePreview();
+    setIsBatchMode(false);
+    Promise.resolve(navigate('/create-workflow')).catch((error) => {
       console.error('Navigation failed:', error);
     });
     if (onSessionClick) {
@@ -219,6 +234,16 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
               siderTooltipProps={siderTooltipProps}
               onClick={handleAssistantClick}
             />
+            {/* 创建工作流 - management-only, hidden behind ui.createWorkflow */}
+            {createWorkflowMode && (
+              <SiderCreateWorkflowEntry
+                isMobile={isMobile}
+                isActive={pathname.startsWith('/create-workflow')}
+                collapsed={collapsed}
+                siderTooltipProps={siderTooltipProps}
+                onClick={handleCreateWorkflowClick}
+              />
+            )}
             {/* Scheduled tasks nav entry - fixed above scroll */}
             {!engineerMode && (
               <SiderScheduledEntry

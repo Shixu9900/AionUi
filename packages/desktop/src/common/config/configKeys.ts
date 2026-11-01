@@ -22,6 +22,12 @@ export type ConfigKeyMap = {
    * `undefined` means on.
    */
   'ui.engineerMode': boolean | undefined;
+  /**
+   * Management-only "创建工作流" surface: compiles a workflow draft
+   * (workflow.md + decisions.yaml + rubric.yaml) into a deployable SKILL.md.
+   * Hidden — no toggle in Settings yet. `undefined`/`false` means off.
+   */
+  'ui.createWorkflow': boolean | undefined;
   /** Aircraft projects shown as cards in the engineer-mode sidebar. */
   'aviator.projects': AircraftProject[] | undefined;
   /** Append-only user judgements (correct / wrong / supplement) and readiness changes, all projects. */

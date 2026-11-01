@@ -156,6 +156,7 @@ export default defineConfig(({ mode }) => {
         // Discontinued-build fork flag (see discontinuedBuild.ts). Only AionUi's
         // final `-final` tag build sets IS_DISCONTINUED_BUILD=true in CI.
         'process.env.IS_DISCONTINUED_BUILD': JSON.stringify(process.env.IS_DISCONTINUED_BUILD === 'true'),
+        'process.env.AVIATOR_CREATE_WORKFLOW_BUILD': JSON.stringify(process.env.AVIATOR_CREATE_WORKFLOW_BUILD !== 'false'),
       },
     },
 
@@ -322,6 +323,7 @@ export default defineConfig(({ mode }) => {
         __APP_VERSION__: JSON.stringify(rootPackageJson.version),
         // Renderer-side discontinued-build flag; consumed via discontinuedBuild.ts.
         __IS_DISCONTINUED_BUILD__: JSON.stringify(process.env.IS_DISCONTINUED_BUILD === 'true'),
+        __AVIATOR_CREATE_WORKFLOW_BUILD__: JSON.stringify(process.env.AVIATOR_CREATE_WORKFLOW_BUILD !== 'false'),
         global: 'globalThis',
       },
       optimizeDeps: {

@@ -13,6 +13,7 @@
 
 export const RECORDS_REVIEW_PACKAGE_FILE = 'records-review.json';
 export const RECORDS_REVIEW_DECISIONS_FILE = 'records-review.decisions.json';
+export const RECORDS_REVIEW_FEEDBACK_FILE = 'records-review.feedback.json';
 
 export type ElicitStance = 'agree' | 'disagree' | 'unsure';
 
@@ -141,6 +142,32 @@ export type Check = {
   rule: string;
   result: CheckResult;
   detail: string;
+  decision_id?: string;
+  evidence_ids?: string[];
+};
+
+export type FieldProvenance = {
+  field: string;
+  decision_id: string;
+  rule_id: string;
+  evidence_ids: string[];
+};
+
+export type FeedbackAction = 'accepted' | 'corrected';
+
+export type FeedbackItem = {
+  decision_id: string;
+  field: string;
+  before: unknown;
+  after: unknown;
+  action: FeedbackAction;
+  evidence_ids: string[];
+  at: string;
+};
+
+export type FeedbackFile = {
+  schema: 'aviator.review-feedback/v1';
+  items: FeedbackItem[];
 };
 
 export type ChainPoint = {
@@ -221,4 +248,5 @@ export type ComponentReview = {
   evidence: EvidenceGraph;
   part_tree: PartTree;
   documents: DocumentEntry[];
+  field_provenance?: FieldProvenance[];
 };

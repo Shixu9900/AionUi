@@ -43,6 +43,16 @@ import type {
 } from '../types/platform/acpTypes';
 import type { ComponentReview, RecordsReviewPackage } from '../types/recordsReview';
 import type {
+  CreateWorkflowCompileRequest,
+  CreateWorkflowCompileResult,
+  CreateWorkflowFileRequest,
+  CreateWorkflowPublishRequest,
+  CreateWorkflowPublishResult,
+  CreateWorkflowStatus,
+  CreateWorkflowStatusRequest,
+  CreateWorkflowWriteRequest,
+} from '../types/createWorkflow';
+import type {
   CreateProviderRequest,
   FetchModelsAnonymousRequest,
   FetchModelsResponse,
@@ -805,6 +815,20 @@ export const dialog = {
       return nativeShowOpen.invoke(options);
     }) as typeof nativeShowOpen.invoke,
   },
+};
+
+// ---------------------------------------------------------------------------
+// Create Workflow — native IPC, main-process-only. Reads/writes workflow
+// drafts in the private aviator repo by absolute path (outside any project
+// sandbox), so this stays Electron-only like the skill-file channels below.
+// ---------------------------------------------------------------------------
+
+export const createWorkflow = {
+  status: bridge.buildProvider<CreateWorkflowStatus, CreateWorkflowStatusRequest>('createWorkflow.status'),
+  compile: bridge.buildProvider<CreateWorkflowCompileResult, CreateWorkflowCompileRequest>('createWorkflow.compile'),
+  readFile: bridge.buildProvider<string, CreateWorkflowFileRequest>('createWorkflow.readFile'),
+  writeFile: bridge.buildProvider<boolean, CreateWorkflowWriteRequest>('createWorkflow.writeFile'),
+  publish: bridge.buildProvider<CreateWorkflowPublishResult, CreateWorkflowPublishRequest>('createWorkflow.publish'),
 };
 
 // ---------------------------------------------------------------------------

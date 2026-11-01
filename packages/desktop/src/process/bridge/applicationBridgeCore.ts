@@ -13,6 +13,7 @@ import os from 'os';
 import path from 'path';
 import { ipcBridge } from '@/common';
 import { createSkillFileService } from '@process/services/skills';
+import { createCreateWorkflowService } from '@process/services/createWorkflow/createWorkflowService';
 import { getSystemDir, ProcessEnv } from '@process/utils/initStorage';
 import { copyDirectoryRecursively, getConfigPath, getDataPath, resolveCliSafePath } from '@process/utils';
 
@@ -22,6 +23,15 @@ export function initApplicationBridgeCore(): void {
   ipcBridge.fs.readSkillFile.provider(({ skill_location, relative_path }) =>
     skillFiles.read(skill_location, relative_path)
   );
+
+  // "创建工作流" — management-only. Reads/writes the private aviator repo's
+  // workflow drafts by absolute path; see createWorkflowService.ts.
+  const createWorkflowService = createCreateWorkflowService();
+  ipcBridge.createWorkflow.status.provider(createWorkflowService.status);
+  ipcBridge.createWorkflow.compile.provider(createWorkflowService.compile);
+  ipcBridge.createWorkflow.readFile.provider(createWorkflowService.readFile);
+  ipcBridge.createWorkflow.writeFile.provider(createWorkflowService.writeFile);
+  ipcBridge.createWorkflow.publish.provider(createWorkflowService.publish);
 
   // application.systemInfo is served by the backend via HTTP; updateSystemInfo
   // and getPath below remain buildProvider (true IPC) because they need

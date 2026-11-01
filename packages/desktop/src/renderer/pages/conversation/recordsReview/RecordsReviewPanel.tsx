@@ -11,9 +11,9 @@ import { useTranslation } from 'react-i18next';
 import type {
   CheckResult,
   ComponentReview,
-  ElicitItem,
-  ElicitStance,
   EvidenceCard,
+  FeedbackAction,
+  FeedbackItem,
   OpenItem,
   OpenItemKind,
   PartNode,
@@ -21,12 +21,12 @@ import type {
   TimelineEntry,
   Verdict,
 } from '@/common/types/recordsReview';
-import { ElicitBar } from './ElicitBar';
+import { ConfirmBar } from './ConfirmBar';
 import { CHAIN_COLOR, EvidenceGraph } from './EvidenceGraph';
 import { PageThumb } from './PageImage';
 import { setRecordsReviewOpen } from './recordsReviewStore';
-import { useElicitDecisions } from './useElicitDecisions';
 import { useRecordsReview } from './useRecordsReview';
+import { useReviewFeedback } from './useReviewFeedback';
 
 const fmtCycles = (n: number | null | undefined) => (n == null ? '—' : Math.round(n).toLocaleString('en-US'));
 const fmtHours = (n: number | null | undefined) => {
@@ -294,9 +294,9 @@ const TimelineSection: React.FC<{ review: ComponentReview; onFocus: (ids: string
 const OpenItemsSection: React.FC<{
   review: ComponentReview;
   onFocus: (item: OpenItem) => void;
-  lookup: (target: ElicitItem['target'], id: string) => ElicitItem | undefined;
-  onElicit: (target: ElicitItem['target'], id: string, stance: ElicitStance, reason: string) => void;
-}> = ({ review, onFocus, lookup, onElicit }) => {
+  lookup: (decisionId: string, field: string) => FeedbackItem | undefined;
+  onFeedback: (decisionId: string, field: string, before: unknown, action: FeedbackAction, after: string) => void;
+}> = ({ review, onFocus, lookup, onFeedback }) => {
   const [kind, setKind] = useState<OpenItemKind>('missing');
   const docTitle = new Map(review.documents.map((d) => [d.id, d.title]));
   const counts = { missing: 0, suspicious: 0 };
@@ -346,9 +346,9 @@ const OpenItemsSection: React.FC<{
                   </Tooltip>
                 ))}
               </div>
-              <ElicitBar
-                current={lookup('open_item', item.id)}
-                onChoose={(stance, reason) => onElicit('open_item', item.id, stance, reason)}
+              <ConfirmBar
+                current={lookup(item.rule || item.id, item.id)}
+                onChoose={(action, after) => onFeedback(item.rule || item.id, item.id, item.title, action, after)}
               />
             </div>
           ))}
@@ -423,7 +423,7 @@ export const RecordsReviewPanel: React.FC<{ projectId: string }> = ({ projectId 
   const { t } = useTranslation();
   const { data, error, isLoading, isValidating, mutate } = useRecordsReview(projectId);
   const peId = data?.status === 'ready' ? data.peId : null;
-  const elicit = useElicitDecisions(peId);
+  const feedback = useReviewFeedback(peId);
   const [focus, setFocus] = useState<Set<string>>(new Set());
   const [card, setCard] = useState<EvidenceCard | null>(null);
   const [fullGraph, setFullGraph] = useState(false);
@@ -538,7 +538,21 @@ export const RecordsReviewPanel: React.FC<{ projectId: string }> = ({ projectId 
           <TimelineSection review={review} onFocus={focusIds} />
         </Section>
         <Section title={`③ Open Items（${review.open_items.length}）`}>
-          <OpenItemsSection review={review} onFocus={focusItem} lookup={elicit.lookup} onElicit={elicit.setStance} />
+          <OpenItemsSection
+            review={review}
+            onFocus={focusItem}
+            lookup={feedback.lookup}
+            onFeedback={(decisionId, field, before, action, after) =>
+              feedback.record({
+                decision_id: decisionId,
+                field,
+                before,
+                after: action === 'corrected' ? after : before,
+                action,
+                evidence_ids: [],
+              })
+            }
+          />
         </Section>
         <Section
           title={`④ 证据链追溯（${review.evidence.cards.length} 张卡片）`}
@@ -566,9 +580,18 @@ export const RecordsReviewPanel: React.FC<{ projectId: string }> = ({ projectId 
                     <span className='text-t-primary w-110px flex-shrink-0'>{ch.rule}</span>
                     <span className='text-t-secondary'>{ch.detail}</span>
                   </div>
-                  <ElicitBar
-                    current={elicit.lookup('check', ch.rule)}
-                    onChoose={(stance, reason) => elicit.setStance('check', ch.rule, stance, reason)}
+                  <ConfirmBar
+                    current={feedback.lookup(ch.decision_id || ch.rule, ch.rule)}
+                    onChoose={(action, after) =>
+                      feedback.record({
+                        decision_id: ch.decision_id || ch.rule,
+                        field: ch.rule,
+                        before: ch.result,
+                        after: action === 'corrected' ? after : ch.result,
+                        action,
+                        evidence_ids: ch.evidence_ids ?? [],
+                      })
+                    }
                   />
                 </div>
               );
