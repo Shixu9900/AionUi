@@ -117,7 +117,13 @@ export interface WorkflowDraft {
   changes?: string[];
 }
 
-/** Pointer to the teaching session the page resumes. */
+/** Every workflow taught on this machine; one entry per teaching session directory. */
+export interface WorkflowLibraryIndex {
+  schema: 'aviator.workflow-library/v1';
+  items: WorkflowTeachSession[];
+}
+
+/** One workflow: its teaching session directory, conversation and master assistant. */
 export interface WorkflowTeachSession {
   sessionDir: string;
   relativeDir: string;
