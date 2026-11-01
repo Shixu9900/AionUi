@@ -1,0 +1,28 @@
+.entry {
+  box-sizing: border-box;
+  border: 1px solid var(--create-workflow-border);
+  background: var(--create-workflow-bg);
+  color: var(--create-workflow-fg);
+  --create-workflow-bg: #ece8df;
+  --create-workflow-border: #c4b8a1;
+  --create-workflow-fg: var(--color-text-1);
+}
+
+.entry:hover,
+.entry:active {
+  background: var(--create-workflow-bg-hover);
+  --create-workflow-bg-hover: #e3dccf;
+}
+
+.entryActive {
+  background: var(--create-workflow-bg-active);
+  --create-workflow-bg-active: #d9d0bf;
+}
+
+:global([data-theme='dark']) .entry {
+  --create-workflow-bg: #3a3428;
+  --create-workflow-border: #8a7344;
+  --create-workflow-fg: var(--color-text-1);
+  --create-workflow-bg-hover: #4a4132;
+  --create-workflow-bg-active: #5a4e38;
+}

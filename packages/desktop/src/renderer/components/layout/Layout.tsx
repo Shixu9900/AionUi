@@ -157,7 +157,9 @@ const Layout: React.FC<{
   // The ASI lockup acts as Home / Back-to-Chat, but only from settings routes.
   // In non-settings routes the user is already "home", so it is a no-op (and not actionable).
   const isSettingsRoute = location.pathname.startsWith('/settings');
-  const engineerWorkbench = useEngineerMode() && !isSettingsRoute;
+  // 创建工作流 is a standalone full-width page: no project workbench, preview or explorer.
+  const isCreateWorkflowRoute = location.pathname.startsWith('/create-workflow');
+  const engineerWorkbench = useEngineerMode() && !isSettingsRoute && !isCreateWorkflowRoute;
   // Only wired to the wordmark in the isSettingsRoute branch below, so the
   // "no-op outside settings" contract is enforced structurally — no internal
   // route guard needed (the chat-route wordmark is a plain, inert div).
@@ -503,7 +505,7 @@ const Layout: React.FC<{
               {/* Hoisted preview region (project conversations only). Structurally
                   persistent: lives above the per-conversation subtree, so a
                   same-project conversation switch does not remount it. */}
-              {!engineerWorkbench && previewRegionActive && (
+              {!engineerWorkbench && !isCreateWorkflowRoute && previewRegionActive && (
                 <div
                   data-project-preview-region
                   className='preview-panel flex flex-col relative overflow-visible'
@@ -543,7 +545,7 @@ const Layout: React.FC<{
                   </div>
                 </div>
               )}
-              {!engineerWorkbench && !isMobile && (
+              {!engineerWorkbench && !isCreateWorkflowRoute && !isMobile && (
                 <ProjectPanelHost
                   widthPx={explorerWidthPx}
                   collapsed={explorerCollapsed}
@@ -554,10 +556,12 @@ const Layout: React.FC<{
                 />
               )}
             </div>
-            {!engineerWorkbench && !isMobile && <RecordsReviewHost viewportWidth={viewportWidth} />}
+            {!engineerWorkbench && !isCreateWorkflowRoute && !isMobile && (
+              <RecordsReviewHost viewportWidth={viewportWidth} />
+            )}
 
             {/* Mobile overlay: backdrop + fixed panel + floating collapse handle. */}
-            {isMobile && Boolean(currentProject) && (
+            {isMobile && !isCreateWorkflowRoute && Boolean(currentProject) && (
               <ProjectPanelMobileOverlay
                 projectId={currentProject as string}
                 collapsed={explorerCollapsed}

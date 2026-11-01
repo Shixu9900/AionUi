@@ -263,7 +263,13 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
             />
             {/* Scrollable content: pinned → team (slot) → projects → conversations */}
             <div className={classNames('flex-1 min-h-0 overflow-y-auto', siderStyles.scrollArea)}>
-              {engineerMode ? (
+              {pathname.startsWith('/create-workflow') ? (
+                collapsed ? null : (
+                  <div className='px-12px py-10px text-12px leading-18px text-t-secondary'>
+                    「创建工作流」是独立的专家工作台，不读取也不显示任何用户项目。
+                  </div>
+                )
+              ) : engineerMode ? (
                 <ProjectSider
                   collapsed={collapsed}
                   siderTooltipProps={siderTooltipProps}
