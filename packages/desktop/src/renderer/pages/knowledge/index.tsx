@@ -212,7 +212,19 @@ const KnowledgePage: React.FC = () => {
       setItems(next);
       try {
         const stored = await ipcBridge.documents.ingest.invoke({ project_id: PROJECT_ID, path: filePath });
-        await ipcBridge.documents.parse.invoke({ id: stored.doc_id });
+        let progress = (await ipcBridge.documents.parse.invoke({ id: stored.doc_id })).progress;
+        const settled = (value: { done: number; failed: number }) => value.done + value.failed;
+        // Parsing runs in the background, a page at a time. The first page is
+        // enough to propose a category, so wait for it rather than the whole file.
+        for (
+          let attempt = 0;
+          attempt < 150 && settled(progress) < 1 && !progress.paused && progress.pending + progress.leased > 0;
+          attempt++
+        ) {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+          progress = await ipcBridge.documents.progress.invoke({ doc_id: stored.doc_id });
+        }
+        if (progress.paused) throw new Error(progress.paused);
         const blocks = await ipcBridge.documents.blocks.invoke({ id: stored.doc_id, page_no: 1 });
         const excerpt = blocks
           .map((block) => block.text)

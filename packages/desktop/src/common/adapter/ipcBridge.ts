@@ -44,7 +44,9 @@ import type {
 import type {
   AnnotateRequest,
   ComponentReview,
+  DocumentParseResult,
   DocumentReport,
+  ParseProgress,
   DocumentSearchHit,
   RecordsReviewPackage,
   StoredBlock,
@@ -610,7 +612,10 @@ export const documents = {
   ),
   scan: httpPost<StoredDocument[], { project_id: string; folder: string }>('/api/documents/scan'),
   ingest: httpPost<StoredDocument, { project_id: string; path: string }>('/api/documents/ingest'),
-  parse: httpPost<DocumentReport, { id: string }>((p) => `/api/documents/${p.id}/parse`),
+  parse: httpPost<DocumentParseResult, { id: string }>((p) => `/api/documents/${p.id}/parse`),
+  progress: httpGet<ParseProgress, { doc_id?: string }>(
+    (p) => `/api/documents/progress${p.doc_id ? `?doc_id=${encodeURIComponent(p.doc_id)}` : ''}`
+  ),
   report: httpGet<DocumentReport, { id: string }>((p) => `/api/documents/${p.id}/report`),
   pages: httpGet<StoredPage[], { id: string }>((p) => `/api/documents/${p.id}/pages`),
   blocks: httpGet<StoredBlock[], { id: string; page_no: number }>(

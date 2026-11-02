@@ -54,6 +54,7 @@ export const ParseTab: React.FC<{ projectId: string; fileUrl: (path: string) => 
   const [pageNo, setPageNo] = useState(1);
   const [draft, setDraft] = useState<Bbox | null>(null);
   const [query, setQuery] = useState('');
+  const [parsing, setParsing] = useState<{ done: number; total: number } | null>(null);
   const current = docs.data?.find((d) => d.doc_id === selected) ?? docs.data?.[0];
   const currentId = current?.doc_id;
   const report = useSWR(currentId ? `doc-report/${currentId}` : null, () => ipcBridge.documents.report.invoke({ id: currentId as string }));
@@ -87,8 +88,18 @@ export const ParseTab: React.FC<{ projectId: string; fileUrl: (path: string) => 
   };
   const parse = async () => {
     if (!currentId) return;
-    await ipcBridge.documents.parse.invoke({ id: currentId });
-    await Promise.all([report.mutate(), pages.mutate(), issues.mutate(), blocks.mutate()]);
+    let progress = (await ipcBridge.documents.parse.invoke({ id: currentId })).progress;
+    const finished = (value: { done: number; failed: number }) => value.done + value.failed;
+    setParsing({ done: finished(progress), total: progress.total });
+    // The request only queues the document. Poll until the worker drains it, and
+    // refresh the page each time so finished pages show up while the rest run.
+    for (let attempt = 0; attempt < 600 && finished(progress) < progress.total && !progress.paused; attempt++) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      progress = await ipcBridge.documents.progress.invoke({ doc_id: currentId });
+      setParsing({ done: finished(progress), total: progress.total });
+      await Promise.all([report.mutate(), pages.mutate(), issues.mutate(), blocks.mutate()]);
+    }
+    setParsing(null);
   };
   const save = async () => {
     if (!current || !raw.trim()) return;
@@ -126,8 +137,8 @@ export const ParseTab: React.FC<{ projectId: string; fileUrl: (path: string) => 
         <Button size='mini' type='primary' onClick={() => void scan()}>
           {t('conversation.recordsReview.scanFolder')}
         </Button>
-        <Button size='mini' onClick={() => void parse()} disabled={!currentId}>
-          {t('conversation.recordsReview.parseNow')}
+        <Button size='mini' onClick={() => void parse()} disabled={!currentId || parsing !== null}>
+          {parsing ? `${parsing.done} / ${parsing.total}` : t('conversation.recordsReview.parseNow')}
         </Button>
         <Input
           size='mini'

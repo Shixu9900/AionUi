@@ -300,6 +300,24 @@ export type DocumentReport = {
   engine: string;
 };
 
+export type ParseProgress = {
+  total: number;
+  pending: number;
+  leased: number;
+  done: number;
+  failed: number;
+  /** Set when the worker stopped early, for example because the engine went down. */
+  paused?: string | null;
+};
+
+export type DocumentParseResult = {
+  document: DocumentReport;
+  parsed: number;
+  resumed: number;
+  paused: string | null;
+  progress: ParseProgress;
+};
+
 export type AnnotateRequest = {
   project_id: string;
   sha256: string;
