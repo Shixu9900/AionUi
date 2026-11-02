@@ -1,7 +1,8 @@
 # Custom Themes - Authoring Guide
 
-AionUi ships with **Light** and **Dark** themes, but you can create your own
-color themes without touching any code. A custom theme is just a small block of
+AionUi ships with **Light** and **Dark**, plus Aviator builtins (**Night Cruise**,
+**Aviator Blue**, **Parchment**, **Alloy**, **Light HC**, **Dark HC**). You can
+also create your own color themes without touching any code. A custom theme is just a small block of
 CSS that overrides a set of documented **theme variables** (CSS custom
 properties). This guide shows you exactly what to write and how to apply it.
 

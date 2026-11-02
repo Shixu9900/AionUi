@@ -34,7 +34,7 @@ common/theme/
 └── resolveTheme.ts     # activeId → concrete Theme 解析激活主题
 
 renderer/
-├── theme/builtinThemes.ts             # BUILTIN_THEMES (Light / Dark)
+├── theme/builtinThemes.ts             # BUILTIN_THEMES (Light / Dark + Aviator)
 ├── utils/theme/applyTheme.ts          # Apply a Theme to the DOM 应用主题
 ├── utils/theme/tokensToCss.ts         # tokens → scoped CSS 结构化 token 转 CSS
 ├── utils/theme/customCssProcessor.ts  # Sandbox raw css 沙箱化原始 css
@@ -96,7 +96,7 @@ variables under `:root { … }` and (optionally) `[data-theme='dark'] { … }`.
 ## Best practices 最佳实践
 
 1. Reach for **`tokens`** first; use raw **`css`** only for decoration that the contract cannot express. 优先 `tokens`，`css` 仅用于契约无法表达的装饰。
-2. For appearance-scoped tokens, **always provide both light and dark values**. 随明暗变化的 token 必须同时给出明暗两套值。
+2. For a theme that switches appearance, **provide both light and dark values**. A single-appearance builtin (Night Cruise, Light HC, …) fills only the layer that matches its `appearance`, so the override still beats the baseline. 会随明暗切换的主题必须同时给出明暗两套值；只锁定一种外观的内置主题只填对应层。
 3. **Never hardcode colors in components** — use semantic tokens / variables so custom themes take effect. 组件内禁止硬编码颜色。
 4. Keep background colors neutral for readability. 背景色保持中性以维持可读性。
 
@@ -104,5 +104,5 @@ variables under `:root { … }` and (optionally) `[data-theme='dark'] { … }`.
 
 - ✅ Unified `Theme` model with structured `tokens` + sandboxed `css` channels
 - ✅ Token contract enforced by `tokensToCss` (unknown keys dropped)
-- ✅ Built-in themes: Light / Dark (+ System sentinel)
+- ✅ Built-in themes: Light / Dark (+ System sentinel), Aviator Night Cruise / Aviator Blue / Parchment / Alloy / Light HC / Dark HC
 - ✅ Per-appearance token layering (`:root` / `:root[data-theme]`)

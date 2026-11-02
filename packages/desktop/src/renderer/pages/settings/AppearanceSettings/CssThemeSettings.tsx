@@ -18,20 +18,9 @@ import { BUILTIN_THEMES, DEFAULT_THEME_ID } from './presets.ts';
 import { BACKGROUND_BLOCK_START, injectBackgroundCssBlock } from './backgroundUtils.ts';
 import { resolveExtensionAssetUrl } from '@renderer/utils/platform.ts';
 import { LIGHT_THEME_ID, SYSTEM_THEME_ID } from '@/common/theme/constants';
+import { previewPaletteFromTokens, type ThemeCardPreviewPalette } from '@renderer/utils/theme/previewPalette';
 
-interface ThemePreviewPalette {
-  appBg: string;
-  headerBg: string;
-  sideBg: string;
-  mainBg: string;
-  border: string;
-  accent: string;
-  textMuted: string;
-  userBubble: string;
-  aiBubble: string;
-}
-
-const fallbackThemePreviewPaletteByMode: Record<'light' | 'dark', ThemePreviewPalette> = {
+const fallbackThemePreviewPaletteByMode: Record<'light' | 'dark', ThemeCardPreviewPalette> = {
   light: {
     appBg: '#f7f8fa',
     headerBg: '#eef1f5',
@@ -113,7 +102,7 @@ const readFromVarMap = (vars: Record<string, string>, keys: string[]) => {
   return '';
 };
 
-const extractThemePreviewPalette = (css: string, mode: 'light' | 'dark'): ThemePreviewPalette => {
+const extractThemePreviewPalette = (css: string, mode: 'light' | 'dark'): ThemeCardPreviewPalette => {
   const modeFallback = fallbackThemePreviewPaletteByMode[mode];
   const rootVars = parseCssVarsFromBlocks(css, ':root');
   const darkVars = {
@@ -144,7 +133,7 @@ const extractThemePreviewPalette = (css: string, mode: 'light' | 'dark'): ThemeP
   };
 };
 
-const ThemeLayoutPreview: React.FC<{ palette: ThemePreviewPalette }> = ({ palette }) => {
+const ThemeLayoutPreview: React.FC<{ palette: ThemeCardPreviewPalette }> = ({ palette }) => {
   return (
     <div className='absolute inset-0 pointer-events-none'>
       <div className='absolute inset-0' style={{ background: palette.appBg }} />
@@ -249,9 +238,12 @@ const CssThemeSettings: React.FC = () => {
   const activeThemeId = activeId ?? activeTheme?.id ?? DEFAULT_THEME_ID;
 
   const themePreviewPalettes = useMemo(() => {
-    const map = new Map<string, ThemePreviewPalette>();
+    const map = new Map<string, ThemeCardPreviewPalette>();
     themes.forEach((cssTheme) => {
-      map.set(cssTheme.id, extractThemePreviewPalette(cssTheme.css || '', currentTheme === 'dark' ? 'dark' : 'light'));
+      const fromCss = extractThemePreviewPalette(cssTheme.css || '', currentTheme === 'dark' ? 'dark' : 'light');
+      // Token builtins (Aviator) preview from their own appearance layer.
+      // CSS-only themes keep the extractor above.
+      map.set(cssTheme.id, previewPaletteFromTokens(cssTheme.tokens, cssTheme.appearance, fromCss) ?? fromCss);
     });
     return map;
   }, [themes, currentTheme]);

@@ -1,5 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { applyTheme } from '@/renderer/utils/theme/applyTheme';
+import { AVIATOR_BUILTIN_THEMES } from '@/renderer/theme/aviatorBuiltinThemes';
+import { AVIATOR_NIGHT_CRUISE_THEME_ID, AVIATOR_HC_LIGHT_THEME_ID } from '@/common/theme/constants';
 import type { Theme } from '@/common/theme/types';
 
 const base = { builtin: true, created_at: 0, updated_at: 0 };
@@ -78,5 +80,28 @@ describe('applyTheme', () => {
     // Switching to a theme without tokens must clear the block.
     applyTheme({ ...base, id: 'light', name: 'Light', appearance: 'light' } as Theme);
     expect(document.getElementById('theme-tokens')).toBeNull();
+  });
+
+  it('applies Night Cruise as dark and writes its amber tokens', () => {
+    const theme = AVIATOR_BUILTIN_THEMES.find((item) => item.id === AVIATOR_NIGHT_CRUISE_THEME_ID);
+    expect(theme).toBeDefined();
+    if (!theme) return;
+    applyTheme(theme);
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+    expect(document.body.getAttribute('arco-theme')).toBe('dark');
+    const css = document.getElementById('theme-tokens')?.textContent ?? '';
+    expect(css).toContain('--primary: #C4A574');
+    expect(css).toContain('--bg-base: #0B0C0E');
+  });
+
+  it('applies Light HC as light without leaking a dark token block', () => {
+    const theme = AVIATOR_BUILTIN_THEMES.find((item) => item.id === AVIATOR_HC_LIGHT_THEME_ID);
+    expect(theme).toBeDefined();
+    if (!theme) return;
+    applyTheme(theme);
+    expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+    const css = document.getElementById('theme-tokens')?.textContent ?? '';
+    expect(css).toContain('--primary: #0072B2');
+    expect(css).not.toContain(":root[data-theme='dark']");
   });
 });

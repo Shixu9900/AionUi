@@ -17,6 +17,17 @@
  *
  * Dark-mode entries are the same hues lightened for contrast on dark
  * backgrounds, not a different palette.
+ *
+ * This palette is global per appearance. Aviator builtins do not replace it,
+ * so existing charts keep these hues. Recommended per-theme series (distinct
+ * from status red/amber/green and from each theme's `--primary`), if a future
+ * per-theme hook is added:
+ * - Night Cruise: #6B8FA8 #8B7BA8 #7A9A9E #A090A8 #7A8898 #8A9488
+ * - Aviator Blue: #5B7C99 #7A6A9A #6A9590 #8B7355 #6D7A8B #9A8A78
+ * - Parchment: #5B7C99 #B08968 #7A6A9A #A67C8A #6D8B74 #8B7355
+ * - Alloy: #6B8499 #8A7A99 #7A9590 #9A8A78 #6D7A8B #9A8490
+ * - Light HC: #E69F00 #56B4E9 #009E73 #CC79A7
+ * - Dark HC: #F0C000 #7EC8F0 #3DDBA8 #FFB3D9
  */
 export const CHART_SERIES_PALETTE = {
   light: ['#3b82f6', '#14b8a6', '#8b5cf6', '#f59e0b', '#ec4899', '#64748b'],
