@@ -5,12 +5,18 @@
  */
 
 import { useSyncExternalStore } from 'react';
+import type {
+  WorkbenchShowArgs,
+  WorkbenchShowFocus,
+  WorkbenchShowLifeView,
+  WorkbenchShowPage,
+} from '@/common/chat/workbenchShow';
 
-export type WorkbenchPage = 'overview' | 'llp' | 'records' | 'report';
+export type WorkbenchPage = WorkbenchShowPage;
 export type WorkbenchSubject = 'aircraft' | 'engine' | 'blade';
-export type LifeView = 'full' | 'budget' | 'yearly';
+export type LifeView = WorkbenchShowLifeView;
 export type EvMetric = 'all' | 'tsn' | 'csn';
-export type WorkbenchFocus = 'summary' | 'life' | 'evidence' | 'items';
+export type WorkbenchFocus = WorkbenchShowFocus;
 
 export type WorkbenchState = {
   page: WorkbenchPage;
@@ -22,6 +28,11 @@ export type WorkbenchState = {
   aircraftId: string | null;
   /** Selected LLP node. */
   selectedId: string | null;
+  /**
+   * Part number / serial number / node id the assistant asked to show. The LLP
+   * page resolves it against its part tree and moves it into `selectedId`.
+   */
+  partQuery: string | null;
   /** Selected Annex II item in the delivery package, e.g. `F007`. */
   packageItem: string | null;
 };
@@ -45,6 +56,7 @@ let state: WorkbenchState = {
   driveId: 'verdict',
   aircraftId: readAircraftId(),
   selectedId: null,
+  partQuery: null,
   packageItem: null,
 };
 
@@ -73,5 +85,17 @@ export const patchWorkbench = (patch: Partial<WorkbenchState>): void => {
 
 export const setWorkbenchAircraft = (aircraftId: string | null): void => {
   if (aircraftId === state.aircraftId) return;
-  patchWorkbench({ aircraftId, subject: 'aircraft', page: 'overview', packageItem: null });
+  patchWorkbench({ aircraftId, subject: 'aircraft', page: 'overview', packageItem: null, partQuery: null });
+};
+
+/** Applies an assistant `workbench_show` request to the center pane. */
+export const showInWorkbench = (args: WorkbenchShowArgs): void => {
+  const patch: Partial<WorkbenchState> = { page: args.page };
+  if (args.page === 'llp') {
+    patch.focus = args.focus ?? 'summary';
+    patch.lifeView = args.life_view ?? 'full';
+    if (args.part) patch.partQuery = args.part;
+  }
+  if (args.page === 'records' && args.package_item) patch.packageItem = args.package_item;
+  patchWorkbench(patch);
 };

@@ -43,6 +43,8 @@ export type GuidSendDeps = {
   availableMcpServers: IMcpServer[];
   selectedMcpServerIds: string[] | undefined;
   assistantDefaultMcpIds?: string[];
+  /** Built-in servers the workspace itself requires (e.g. the workbench MCP for an aircraft project), regardless of the user's MCP selection. */
+  requiredSessionMcpServers?: IMcpServer[];
   isGoogleAuth: boolean;
 
   // Mention state reset
@@ -55,6 +57,8 @@ export type GuidSendDeps = {
   navigate: NavigateFunction;
   t: TFunction;
   localeKey: string;
+  /** After a conversation is created in a workspace folder, bind it to the aircraft project if any. */
+  onConversationCreated?: (conversationId: string, workspace: string) => void | Promise<void>;
 };
 
 export type GuidSendResult = {
@@ -89,6 +93,7 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
     availableMcpServers,
     selectedMcpServerIds,
     assistantDefaultMcpIds,
+    requiredSessionMcpServers,
     setMentionOpen,
     setMentionQuery,
     setMentionSelectorOpen,
@@ -96,6 +101,7 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
     navigate,
     t,
     localeKey,
+    onConversationCreated,
   } = deps;
   const sendingRef = useRef(false);
 
@@ -130,12 +136,19 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
       selectedMcpServerIds !== undefined ? selectedAllMcpServerIds : defaultSelectedMcpServerIds;
     const selectedUserMcpServerIdsToSend =
       selectedMcpServerIds !== undefined ? selectedUserMcpServerIds : defaultSelectedUserMcpServerIds;
-    const selectedSessionMcpServersToSend =
+    const chosenSessionMcpServers =
       selectedMcpServerIds !== undefined
         ? selectedAllSessionMcpServers
         : availableMcpServers
             .filter((server) => (defaultSelectedMcpServerIds ?? []).includes(server.id))
             .map((server) => toSessionMcpServer(server));
+    const chosenSessionMcpIds = new Set(chosenSessionMcpServers.map((server) => server.id));
+    const selectedSessionMcpServersToSend = [
+      ...chosenSessionMcpServers,
+      ...(requiredSessionMcpServers ?? [])
+        .filter((server) => !chosenSessionMcpIds.has(server.id))
+        .map((server) => toSessionMcpServer(server)),
+    ];
 
     // `current_model` is the aionrs provider selection and means nothing to a
     // CLI agent, which owns its own model list. Used as a blanket fallback it
@@ -210,6 +223,9 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
         }
 
         emitter.emit('chat.history.refresh');
+        if (isCustomWorkspace) {
+          await onConversationCreated?.(conversation.id, finalWorkspace);
+        }
 
         // Empty input = "start chat": create the conversation but do not stash an
         // initial message, so the window opens idle on the empty state instead of
@@ -264,6 +280,9 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
       }
 
       emitter.emit('chat.history.refresh');
+      if (isCustomWorkspace) {
+        await onConversationCreated?.(conversation.id, finalWorkspace);
+      }
 
       // Empty input = "start chat": create the conversation but do not stash an
       // initial message, so the window opens idle on the empty state instead of
@@ -298,9 +317,11 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
     availableMcpServers,
     selectedMcpServerIds,
     assistantDefaultMcpIds,
+    requiredSessionMcpServers,
     navigate,
     t,
     localeKey,
+    onConversationCreated,
   ]);
 
   const sendMessageHandler = useCallback(() => {

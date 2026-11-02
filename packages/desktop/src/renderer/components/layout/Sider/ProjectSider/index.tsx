@@ -9,24 +9,24 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 import { Dropdown, Menu, Message, Modal, Tooltip } from '@arco-design/web-react';
-import { Down, More, Right } from '@icon-park/react';
+import { More } from '@icon-park/react';
 import ReadinessBadge from '@renderer/pages/workbench/ReadinessBadge';
 import { ipcBridge } from '@/common';
-import type { TChatConversation } from '@/common/config/storage';
+import {
+  extraConversationsToArchive,
+  pickAdoptableConversation,
+} from '@/common/chat/projectConversation';
 import type { AircraftProject } from '@/common/types/aircraftProject';
 import { useConversationHistoryContext } from '@renderer/hooks/context/ConversationHistoryContext';
 import { useAircraftProjects, type AircraftProjectDraft } from '@renderer/hooks/config/useAircraftProjects';
 import { setWorkbenchAircraft } from '@renderer/pages/workbench/workbenchStore';
 import { getActivityTime } from '@renderer/utils/chat/timeline';
+import { emitter } from '@/renderer/utils/emitter';
 import { cleanupSiderTooltips, type SiderTooltipProps } from '@renderer/utils/ui/siderTooltip';
 import { blurActiveElement } from '@renderer/utils/ui/focus';
 import ProjectFormModal from './ProjectFormModal';
 
 const ACTIVE_PROJECT_KEY = 'aviator.activeProjectId';
-const OTHERS_COLLAPSED_KEY = 'aviator.otherConversationsCollapsed';
-const CARD_CONVERSATION_LIMIT = 6;
-
-const normalizePath = (value: string) => value.replace(/[\\/]+$/, '');
 
 const readLocal = (key: string): string | null => {
   try {
@@ -43,11 +43,6 @@ const writeLocal = (key: string, value: string | null) => {
   } catch {
     // ignore
   }
-};
-
-const isTeamConversation = (conversation: TChatConversation): boolean => {
-  const extra = conversation.extra as { team_id?: string; teamId?: string } | undefined;
-  return Boolean(extra?.team_id || extra?.teamId);
 };
 
 function useRelativeTime() {
@@ -85,40 +80,17 @@ const ProjectSider: React.FC<ProjectSiderProps> = ({
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { conversations } = useConversationHistoryContext();
-  const { projects, createProject, updateProject, removeProject } = useAircraftProjects();
+  const { projects, createProject, updateProject, patchProject, removeProject } = useAircraftProjects();
   const relativeTime = useRelativeTime();
   const [selectedId, setSelectedId] = useState<string | null>(() => readLocal(ACTIVE_PROJECT_KEY));
   const [editing, setEditing] = useState<AircraftProject | null>(null);
-  const [othersCollapsed, setOthersCollapsed] = useState(() => readLocal(OTHERS_COLLAPSED_KEY) === '1');
 
   const activeConversationId = pathname.startsWith('/conversation/') ? pathname.split('/')[2] : undefined;
 
-  const { byProject, others } = useMemo(() => {
-    const index = new Map<string, string>();
-    projects.forEach((p) => {
-      if (p.workspace) index.set(normalizePath(p.workspace), p.id);
-    });
-    const grouped = new Map<string, TChatConversation[]>();
-    const rest: TChatConversation[] = [];
-    conversations
-      .filter((c) => !isTeamConversation(c))
-      .toSorted((a, b) => getActivityTime(b) - getActivityTime(a))
-      .forEach((c) => {
-        const workspace = c.extra?.custom_workspace ? c.extra?.workspace : undefined;
-        const projectId = workspace ? index.get(normalizePath(workspace)) : undefined;
-        if (projectId) grouped.set(projectId, [...(grouped.get(projectId) ?? []), c]);
-        else rest.push(c);
-      });
-    return { byProject: grouped, others: rest };
-  }, [conversations, projects]);
-
   const routeProjectId = useMemo(() => {
     if (!activeConversationId) return undefined;
-    for (const [projectId, list] of byProject) {
-      if (list.some((c) => c.id === activeConversationId)) return projectId;
-    }
-    return undefined;
-  }, [activeConversationId, byProject]);
+    return projects.find((project) => project.conversationId === activeConversationId)?.id;
+  }, [activeConversationId, projects]);
 
   const activeProjectId = routeProjectId ?? selectedId;
 
@@ -134,10 +106,51 @@ const ProjectSider: React.FC<ProjectSiderProps> = ({
     if (id) setWorkbenchAircraft(id);
   };
 
-  const askInProject = (project: AircraftProject) => {
-    select(project.id);
-    leaveSider();
+  const goToGuid = (project: AircraftProject) => {
     void navigate('/guid', { state: project.workspace ? { workspace: project.workspace } : { resetAssistant: true } });
+  };
+
+  const archiveExtras = (workspace: string, keepId: string, count: number) => {
+    Modal.confirm({
+      title: t('conversation.aircraftProject.adoptTitle'),
+      content: t('conversation.aircraftProject.adoptContent', { count }),
+      okText: t('conversation.aircraftProject.adoptConfirm'),
+      cancelText: t('conversation.aircraftProject.adoptCancel'),
+      onOk: async () => {
+        const extras = extraConversationsToArchive(conversations, workspace, keepId);
+        await Promise.all(
+          extras.map((conversation) =>
+            ipcBridge.sidebar.archive.invoke({ item_type: 'conversation', item_id: conversation.id })
+          )
+        );
+        emitter.emit('chat.history.refresh');
+      },
+    });
+  };
+
+  const openBoundConversation = async (project: AircraftProject): Promise<boolean> => {
+    if (!project.conversationId) return false;
+    const conversation = await ipcBridge.conversation.get.invoke({ id: project.conversationId });
+    if (conversation?.id) {
+      void navigate(`/conversation/${conversation.id}`);
+      return true;
+    }
+    await patchProject(project.id, { conversationId: undefined });
+    return false;
+  };
+
+  const adoptOrGuid = async (project: AircraftProject) => {
+    if (project.workspace) {
+      const adopted = pickAdoptableConversation(conversations, project.workspace);
+      if (adopted) {
+        await patchProject(project.id, { conversationId: adopted.id });
+        const extras = extraConversationsToArchive(conversations, project.workspace, adopted.id);
+        if (extras.length > 0) archiveExtras(project.workspace, adopted.id, extras.length);
+        void navigate(`/conversation/${adopted.id}`);
+        return;
+      }
+    }
+    goToGuid(project);
   };
 
   const openProject = (project: AircraftProject) => {
@@ -146,18 +159,20 @@ const ProjectSider: React.FC<ProjectSiderProps> = ({
       return;
     }
     select(project.id);
-    const latest = byProject.get(project.id)?.[0];
     leaveSider();
-    if (latest) void navigate(`/conversation/${latest.id}`);
-    else
-      void navigate('/guid', {
-        state: project.workspace ? { workspace: project.workspace } : { resetAssistant: true },
-      });
+    void (async () => {
+      if (await openBoundConversation(project)) return;
+      await adoptOrGuid(project);
+    })();
   };
 
-  const openConversation = (conversation: TChatConversation) => {
+  const askInProject = (project: AircraftProject) => {
+    select(project.id);
     leaveSider();
-    void navigate(`/conversation/${conversation.id}`);
+    void (async () => {
+      if (await openBoundConversation(project)) return;
+      goToGuid(project);
+    })();
   };
 
   const confirmRemove = (project: AircraftProject) => {
@@ -183,13 +198,6 @@ const ProjectSider: React.FC<ProjectSiderProps> = ({
     const project = await createProject(draft);
     onCreatingChange(false);
     askInProject(project);
-  };
-
-  const toggleOthers = () => {
-    setOthersCollapsed((prev) => {
-      writeLocal(OTHERS_COLLAPSED_KEY, prev ? '0' : '1');
-      return !prev;
-    });
   };
 
   const modal = (
@@ -233,28 +241,10 @@ const ProjectSider: React.FC<ProjectSiderProps> = ({
     );
   }
 
-  const renderConversationRow = (conversation: TChatConversation, nested: boolean) => (
-    <div
-      key={conversation.id}
-      id={`c-${conversation.id}`}
-      className={classNames(
-        'h-30px flex items-center gap-6px rd-6px cursor-pointer text-13px transition-colors min-w-0',
-        nested ? 'ps-12px pe-8px' : 'px-10px',
-        activeConversationId === conversation.id
-          ? 'bg-[rgba(var(--primary-6),0.10)] text-t-primary font-500'
-          : 'text-t-secondary hover:bg-fill-3 hover:text-t-primary'
-      )}
-      onClick={() => openConversation(conversation)}
-    >
-      <span className='flex-1 truncate'>{conversation.name || t('conversation.aircraftProject.untitled')}</span>
-      <span className='shrink-0 text-11px text-t-tertiary'>{relativeTime(getActivityTime(conversation))}</span>
-    </div>
-  );
-
   const renderCard = (project: AircraftProject) => {
-    const list = byProject.get(project.id) ?? [];
+    const bound = conversations.find((conversation) => conversation.id === project.conversationId);
     const active = activeProjectId === project.id;
-    const lastTime = Math.max(project.updatedAt, list[0] ? getActivityTime(list[0]) : 0);
+    const lastTime = Math.max(project.updatedAt, bound ? getActivityTime(bound) : 0);
     const subtitle = [project.aircraftType, project.registration].filter(Boolean).join(' · ');
     return (
       <div
@@ -289,9 +279,7 @@ const ProjectSider: React.FC<ProjectSiderProps> = ({
                   : `conversation.aircraftProject.kinds.${project.kind}`
               )}
             </span>
-            <span className='truncate'>
-              {t('conversation.aircraftProject.conversationCount', { count: list.length })} · {relativeTime(lastTime)}
-            </span>
+            <span className='truncate'>{t('conversation.aircraftProject.lastActive', { time: relativeTime(lastTime) })}</span>
           </div>
           <div className='absolute top-8px end-6px' onClick={(e) => e.stopPropagation()}>
             <Dropdown
@@ -324,11 +312,6 @@ const ProjectSider: React.FC<ProjectSiderProps> = ({
             </Dropdown>
           </div>
         </div>
-        {active && list.length > 0 && (
-          <div className='px-6px pb-8px flex flex-col gap-1px'>
-            {list.slice(0, CARD_CONVERSATION_LIMIT).map((c) => renderConversationRow(c, true))}
-          </div>
-        )}
       </div>
     );
   };
@@ -352,19 +335,6 @@ const ProjectSider: React.FC<ProjectSiderProps> = ({
         <div className='flex flex-col gap-6px'>{projects.map(renderCard)}</div>
       )}
 
-      {others.length > 0 && (
-        <div className='flex flex-col gap-1px pt-6px'>
-          <div
-            className='h-24px px-8px flex items-center gap-4px cursor-pointer text-12px font-500 text-t-tertiary hover:text-t-secondary'
-            onClick={toggleOthers}
-          >
-            {othersCollapsed ? <Right theme='outline' size='10' /> : <Down theme='outline' size='10' />}
-            <span>{t('conversation.aircraftProject.otherConversations')}</span>
-            <span className='ms-auto'>{others.length}</span>
-          </div>
-          {!othersCollapsed && others.map((c) => renderConversationRow(c, false))}
-        </div>
-      )}
       {modal}
     </div>
   );

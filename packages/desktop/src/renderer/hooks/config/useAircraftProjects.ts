@@ -7,6 +7,18 @@ export type AircraftProjectDraft = Omit<AircraftProject, 'id' | 'createdAt' | 'u
 
 const EMPTY: AircraftProject[] = [];
 
+const trimTrailingSeparators = (value: string) => value.replace(/[\\/]+$/, '');
+
+/** The project whose workspace folder is `workspace`, if any. */
+export const findProjectByWorkspace = (
+  projects: readonly AircraftProject[],
+  workspace: string | undefined
+): AircraftProject | undefined => {
+  if (!workspace) return undefined;
+  const target = trimTrailingSeparators(workspace);
+  return projects.find((p) => p.workspace && trimTrailingSeparators(p.workspace) === target);
+};
+
 export function useAircraftProjects() {
   const [stored, setStored] = useConfig('aviator.projects');
   const projects = stored ?? EMPTY;

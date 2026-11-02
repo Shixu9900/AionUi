@@ -12,6 +12,8 @@ import { resolveLocaleKey } from '@/common/utils';
 import type { AssistantDetail } from '@/common/types/agent/assistantTypes';
 
 import { useInputFocusRing } from '@/renderer/hooks/chat/useInputFocusRing';
+import { BUILTIN_WORKBENCH_MCP_NAME } from '@/common/chat/workbenchShow';
+import { findProjectByWorkspace, useAircraftProjects } from '@/renderer/hooks/config/useAircraftProjects';
 import { useEngineerMode } from '@/renderer/hooks/config/useEngineerMode';
 import { appendPromptToDraft } from '@/renderer/hooks/chat/useSendBoxDraft';
 import { getFuzzyMatchIndices, useSlashCommandController } from '@/renderer/hooks/chat/useSlashCommandController';
@@ -246,6 +248,44 @@ const GuidPage: React.FC = () => {
     [slashController.filteredCommands, slashController.query]
   );
 
+  const engineerMode = useEngineerMode();
+  const { projects: aircraftProjects, patchProject } = useAircraftProjects();
+  const inAircraftProject = engineerMode && findProjectByWorkspace(aircraftProjects, guidInput.dir) != null;
+  const bindCreatedConversation = useCallback(
+    async (conversationId: string, workspace: string) => {
+      const project = findProjectByWorkspace(aircraftProjects, workspace);
+      if (!project || project.conversationId) return;
+      await patchProject(project.id, { conversationId });
+    },
+    [aircraftProjects, patchProject]
+  );
+
+  useEffect(() => {
+    if (!engineerMode) return;
+    const workspace = guidInput.dir || navState?.workspace;
+    const project = findProjectByWorkspace(aircraftProjects, workspace);
+    if (!project?.conversationId) return;
+    let cancelled = false;
+    void ipcBridge.conversation.get.invoke({ id: project.conversationId }).then((conversation) => {
+      if (cancelled) return;
+      if (conversation?.id) {
+        void navigate(`/conversation/${conversation.id}`, { replace: true });
+        return;
+      }
+      void patchProject(project.id, { conversationId: undefined });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [aircraftProjects, engineerMode, guidInput.dir, navState?.workspace, navigate, patchProject]);
+  const requiredSessionMcpServers = useMemo(
+    () =>
+      inAircraftProject
+        ? availableMcpServers.filter((server) => server.builtin === true && server.name === BUILTIN_WORKBENCH_MCP_NAME)
+        : [],
+    [availableMcpServers, inAircraftProject]
+  );
+
   const send = useGuidSend({
     // Input state
     input: guidInput.input,
@@ -272,6 +312,7 @@ const GuidPage: React.FC = () => {
     availableMcpServers,
     selectedMcpServerIds: guidSelectedMcpServerIds,
     assistantDefaultMcpIds: resolvedAssistantDefaults.mcpIds,
+    requiredSessionMcpServers,
     isGoogleAuth: modelSelection.isGoogleAuth,
 
     // Mention state reset
@@ -284,6 +325,7 @@ const GuidPage: React.FC = () => {
     navigate,
     t,
     localeKey,
+    onConversationCreated: bindCreatedConversation,
   });
 
   // --- Coordinated handlers (depend on multiple hooks) ---
@@ -319,7 +361,6 @@ const GuidPage: React.FC = () => {
     [agentSelection.setSelectedAssistantId]
   );
 
-  const engineerMode = useEngineerMode();
   const welcomePlaceholder = engineerMode ? t('guid.engineer.placeholder') : t('conversation.welcome.placeholder');
   // Typewriter placeholder
   const typewriterPlaceholder = useTypewriterPlaceholder(welcomePlaceholder);

@@ -4,14 +4,22 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ComponentReview, PartNode } from '@/common/types/recordsReview';
 import LifeTrack from './LifeTrack';
 import { LLP_PACKAGE_ITEM, type LlpTarget } from './deliveryPackage';
 import { patchWorkbench, useWorkbenchState, type WorkbenchFocus } from './workbenchStore';
 
-type Row = { id: string; label: string; detail: string; depth: number; reviewable: boolean };
+type Row = {
+  id: string;
+  label: string;
+  detail: string;
+  depth: number;
+  reviewable: boolean;
+  partNumber?: string;
+  serialNumber?: string;
+};
 
 const partRows = (node: PartNode, depth: number): Row[] => [
   {
@@ -20,15 +28,43 @@ const partRows = (node: PartNode, depth: number): Row[] => [
     detail: [node.part_number, node.serial_number].filter(Boolean).join(' · '),
     depth,
     reviewable: node.focus || Boolean(node.serial_number),
+    partNumber: node.part_number,
+    serialNumber: node.serial_number,
   },
   ...node.children.flatMap((child) => partRows(child, depth + 1)),
 ];
 
+const normalizePartKey = (value: string): string => value.replace(/[\s-]/g, '').toUpperCase();
+
+/**
+ * Finds the part-tree row an assistant query refers to: an exact node id first,
+ * then a serial number, then a part number (preferring a reviewable row, since a
+ * part number can repeat across positions).
+ */
+export const resolvePartQuery = (rows: Row[], query: string): string | null => {
+  const byId = rows.find((row) => row.id === query);
+  if (byId) return byId.id;
+  const key = normalizePartKey(query);
+  if (!key) return null;
+  const bySerial = rows.find((row) => row.serialNumber && normalizePartKey(row.serialNumber) === key);
+  if (bySerial) return bySerial.id;
+  const byPart = rows.filter((row) => row.partNumber && normalizePartKey(row.partNumber) === key);
+  return (byPart.find((row) => row.reviewable) ?? byPart[0])?.id ?? null;
+};
+
 const LlpPane: React.FC<{ review: ComponentReview | null }> = ({ review }) => {
   const { t } = useTranslation();
-  const { selectedId, focus, lifeView } = useWorkbenchState();
+  const { selectedId, partQuery, focus, lifeView } = useWorkbenchState();
   const esn = review?.timeline.find((e) => e.host.esn)?.host.esn;
-  const tree = review?.part_tree.root ? partRows(review.part_tree.root, 1) : [];
+  const root = review?.part_tree.root;
+  const tree = useMemo(() => (root ? partRows(root, 1) : []), [root]);
+
+  // Waits for the part tree: the query usually arrives before the review loads.
+  useEffect(() => {
+    if (!partQuery || tree.length === 0) return;
+    const resolved = resolvePartQuery(tree, partQuery);
+    patchWorkbench({ partQuery: null, ...(resolved ? { selectedId: resolved } : {}) });
+  }, [partQuery, tree]);
   const rows: Row[] = [
     {
       id: 'engine',

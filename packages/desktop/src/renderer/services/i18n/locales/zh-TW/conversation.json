@@ -839,6 +839,11 @@
     "removeTitle": "移除專案「{{name}}」？",
     "removeContent": "只從左側列表移除，資料檔案和對話記錄都會保留。",
     "conversationCount": "{{count}} 個對話",
+    "lastActive": "Last activity {{time}}",
+    "adoptTitle": "This project has more than one conversation",
+    "adoptContent": "The most recent qualifying conversation becomes this project's only thread. The other {{count}} will be archived (they stay in Settings and can be restored).",
+    "adoptConfirm": "Archive the others",
+    "adoptCancel": "Keep them for now",
     "askInProject": "在此專案中提問",
     "untitled": "未命名對話",
     "otherConversations": "未歸入專案的對話",
@@ -1007,6 +1012,11 @@
         "llp": "LLP 審查",
         "history": "履歷追溯"
       }
+    },
+    "jump": {
+      "opening": "正在中間欄開啟：{{label}}",
+      "opened": "已在中間開啟：{{label}}",
+      "reopen": "再看一次"
     }
   }
 }

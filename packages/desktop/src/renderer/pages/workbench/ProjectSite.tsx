@@ -21,6 +21,7 @@ import LlpPane from './LlpPane';
 import ReadinessBadge from './ReadinessBadge';
 import PackagePane from './PackagePane';
 import TraceButtons, { CHOICE_COLOR } from './TraceButtons';
+import { useWorkbenchShowListener } from './useWorkbenchShowListener';
 import { patchWorkbench, useWorkbenchState, type WorkbenchPage } from './workbenchStore';
 
 const PAGES: WorkbenchPage[] = ['overview', 'llp', 'records', 'report'];
@@ -92,11 +93,17 @@ const isConfirmed = (action?: ReviewAction) =>
 const useReviewProjectId = (): string | null => {
   const current = useCurrentProject();
   const { conversations } = useConversationHistoryContext();
+  const { aircraftId } = useWorkbenchState();
+  const { projects } = useAircraftProjects();
   return useMemo(() => {
-    if (current) return current;
-    const blade = conversations.find((c) => c.project_id && /RGF34904|叶片/.test(c.name));
-    return blade?.project_id ?? conversations.find((c) => c.project_id)?.project_id ?? null;
-  }, [conversations, current]);
+    const aircraft = projects.find((project) => project.id === aircraftId);
+    if (aircraft) {
+      if (!aircraft.conversationId) return null;
+      const bound = conversations.find((conversation) => conversation.id === aircraft.conversationId);
+      return bound?.project_id ?? null;
+    }
+    return current;
+  }, [aircraftId, conversations, current, projects]);
 };
 
 const Pill: React.FC<{ active: boolean; onClick: () => void; children: React.ReactNode }> = ({
@@ -119,6 +126,7 @@ const Pill: React.FC<{ active: boolean; onClick: () => void; children: React.Rea
 
 const ProjectSite: React.FC = () => {
   const { t } = useTranslation();
+  useWorkbenchShowListener();
   const wb = useWorkbenchState();
   const { projects, updateProject, patchProject } = useAircraftProjects();
   const [editing, setEditing] = React.useState(false);

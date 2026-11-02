@@ -845,6 +845,11 @@
     "removeTitle": "Remove project \"{{name}}\"?",
     "removeContent": "Only removes it from the sidebar. Records and conversations are kept.",
     "conversationCount": "{{count}} conversations",
+    "lastActive": "Last activity {{time}}",
+    "adoptTitle": "This project has more than one conversation",
+    "adoptContent": "The most recent qualifying conversation becomes this project's only thread. The other {{count}} will be archived (they stay in Settings and can be restored).",
+    "adoptConfirm": "Archive the others",
+    "adoptCancel": "Keep them for now",
     "askInProject": "Ask in this project",
     "untitled": "Untitled conversation",
     "otherConversations": "Conversations outside projects",
@@ -1013,6 +1018,11 @@
         "llp": "LLP review",
         "history": "History trace"
       }
+    },
+    "jump": {
+      "opening": "Opening in the workbench: {{label}}",
+      "opened": "Opened in the workbench: {{label}}",
+      "reopen": "Show again"
     }
   }
 }

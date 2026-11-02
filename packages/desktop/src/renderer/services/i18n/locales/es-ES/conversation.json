@@ -840,6 +840,11 @@
     "removeTitle": "¿Quitar el proyecto \"{{name}}\"?",
     "removeContent": "Solo lo quita de la barra lateral. Los registros y las conversaciones se conservan.",
     "conversationCount": "{{count}} conversaciones",
+    "lastActive": "Last activity {{time}}",
+    "adoptTitle": "This project has more than one conversation",
+    "adoptContent": "The most recent qualifying conversation becomes this project's only thread. The other {{count}} will be archived (they stay in Settings and can be restored).",
+    "adoptConfirm": "Archive the others",
+    "adoptCancel": "Keep them for now",
     "askInProject": "Preguntar en este proyecto",
     "untitled": "Conversación sin título",
     "otherConversations": "Conversaciones fuera de proyectos",
@@ -1008,6 +1013,11 @@
         "llp": "LLP review",
         "history": "History trace"
       }
+    },
+    "jump": {
+      "opening": "Abriendo en el panel central: {{label}}",
+      "opened": "Abierto en el panel central: {{label}}",
+      "reopen": "Ver de nuevo"
     }
   }
 }

@@ -360,6 +360,22 @@ describe('useGuidSend', () => {
     setItemSpy.mockRestore();
   });
 
+  it('notifies onConversationCreated with the workspace after creating a conversation', async () => {
+    const onConversationCreated = vi.fn();
+    const deps = createDeps();
+    deps.dir = '/records/msn-1100';
+    deps.selectedAssistantBackend = 'aionrs';
+    deps.current_model = { provider_id: 'openai', model: 'gemini-2.5-pro', use_model: 'gemini-2.5-pro' } as never;
+    deps.onConversationCreated = onConversationCreated;
+
+    const { result } = renderHook(() => useGuidSend(deps));
+    await act(async () => {
+      await result.current.handleSend();
+    });
+
+    expect(onConversationCreated).toHaveBeenCalledWith('conv-1', '/records/msn-1100');
+  });
+
   it('allows an empty-input start for aionrs without stashing an initial message', async () => {
     const setItemSpy = vi.spyOn(Storage.prototype, 'setItem');
     const deps = createDeps();

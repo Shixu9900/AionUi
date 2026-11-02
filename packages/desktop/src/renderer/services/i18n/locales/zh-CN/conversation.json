@@ -839,6 +839,11 @@
     "removeTitle": "移除项目「{{name}}」？",
     "removeContent": "只从左侧列表移除，资料文件和对话记录都会保留。",
     "conversationCount": "{{count}} 个对话",
+    "lastActive": "最近活动 {{time}}",
+    "adoptTitle": "这个项目里有多条对话",
+    "adoptContent": "将把最近一条作为这个项目的唯一对话，其余 {{count}} 条会归档（记录还在，可在设置里找回）。",
+    "adoptConfirm": "归档其余对话",
+    "adoptCancel": "先不归档",
     "askInProject": "在此项目中提问",
     "untitled": "未命名对话",
     "otherConversations": "未归入项目的对话",
@@ -862,6 +867,9 @@
     "process": "过程",
     "browsing": "你在站点里点了一页",
     "empty": "这个项目还没有审查结果。把履历放进资料文件夹后再打开。",
+    "processSteps": "正在做 · {{count}}",
+    "expandConclusion": "展开",
+    "collapseConclusion": "收起",
     "aircraftHint": "已算完的部件是 {{sn}}。点进去看结论和寿命。",
     "openComponent": "打开 {{sn}}",
     "signed": "已签署",
@@ -1007,6 +1015,11 @@
         "llp": "LLP 审查",
         "history": "履历追溯"
       }
+    },
+    "jump": {
+      "opening": "正在中间栏打开：{{label}}",
+      "opened": "已在中间打开：{{label}}",
+      "reopen": "再看一次"
     }
   }
 }

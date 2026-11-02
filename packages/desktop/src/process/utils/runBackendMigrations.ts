@@ -9,6 +9,7 @@ import { migrateConfigStorage, migrateLegacyMcpConfigToDb, migrateProviders } fr
 import { httpRequest } from '@/common/adapter/httpBridge';
 import { mcpService } from '@/common/adapter/ipcBridge';
 import type { ImageGenerationModelSetting } from '@/common/config/clientSettings';
+import { BUILTIN_WORKBENCH_MCP_NAME } from '@/common/chat/workbenchShow';
 import { BUILTIN_BROWSER_MCP_NAME } from '@/common/config/constants';
 import {
   removeImageGenerationEnvKeys,
@@ -38,6 +39,7 @@ const BUILTIN_CHROME_DEVTOOLS_NAME = 'chrome-devtools';
  * happens in the side preview panel where the user can watch it.
  */
 const BUILTIN_BROWSER_SCRIPT = 'builtin-mcp-browser';
+const BUILTIN_WORKBENCH_SCRIPT = 'builtin-mcp-workbench';
 
 const LEGACY_BACKEND_CLIENT_PREFERENCE_KEYS = [
   'assistants',
@@ -200,6 +202,27 @@ function buildBuiltinBrowserServer(): McpImportServer {
   };
 }
 
+function buildBuiltinWorkbenchServer(): McpImportServer {
+  const scriptPath = getBuiltinMcpScriptPath(BUILTIN_WORKBENCH_SCRIPT);
+  const serverConfig = {
+    command: 'node',
+    args: [scriptPath],
+  };
+
+  return {
+    name: BUILTIN_WORKBENCH_MCP_NAME,
+    description: "Open results in the engineer workbench's center pane. Attached automatically to project conversations.",
+    enabled: true,
+    builtin: true,
+    transport: {
+      type: 'stdio',
+      command: serverConfig.command,
+      args: serverConfig.args,
+    },
+    original_json: JSON.stringify({ mcpServers: { [BUILTIN_WORKBENCH_MCP_NAME]: serverConfig } }, null, 2),
+  };
+}
+
 function buildDefaultMcpServers(): McpImportServer[] {
   const chromeConfig = {
     command: 'npx',
@@ -220,6 +243,7 @@ function buildDefaultMcpServers(): McpImportServer[] {
       original_json: JSON.stringify({ mcpServers: { [BUILTIN_CHROME_DEVTOOLS_NAME]: chromeConfig } }, null, 2),
     },
     buildBuiltinBrowserServer(),
+    buildBuiltinWorkbenchServer(),
   ];
 }
 
@@ -407,41 +431,45 @@ async function ensureBootstrapMcpServersInDb(configFile: ConfigFile): Promise<vo
    * is decided by name, it is never re-inserted, leaving the browser tools broken with
    * no self-heal. Reconcile against the real path on every startup instead.
    */
-  const existingBrowserServer = existing.find((server) => server.name === BUILTIN_BROWSER_MCP_NAME);
-  let browserServerUpdated = false;
-  if (existingBrowserServer) {
-    const desiredBrowserServer = buildBuiltinBrowserServer();
-    const browserTransportChanged = !isSameStdioTransport(
-      existingBrowserServer.transport,
-      desiredBrowserServer.transport
-    );
-    const browserJsonChanged = existingBrowserServer.original_json !== desiredBrowserServer.original_json;
-    if (browserTransportChanged || browserJsonChanged) {
-      console.info(
-        '[Migration] browser MCP path drifted, server id: %s, transport changed: %s, json changed: %s',
-        existingBrowserServer.id,
-        browserTransportChanged ? 'yes' : 'no',
-        browserJsonChanged ? 'yes' : 'no'
-      );
-      await mcpService.updateServer.invoke({
-        id: existingBrowserServer.id,
-        data: {
-          transport: desiredBrowserServer.transport,
-          original_json: desiredBrowserServer.original_json,
-        },
-      });
-      browserServerUpdated = true;
-    }
-  }
+  const browserServerUpdated = await reconcileBuiltinScriptPath(existing, buildBuiltinBrowserServer(), 'browser');
+  const workbenchServerUpdated = await reconcileBuiltinScriptPath(existing, buildBuiltinWorkbenchServer(), 'workbench');
 
   console.info(
-    '[Migration] MCP bootstrap completed, imported %d missing defaults, updated image server: %s, updated browser server: %s, image config source: %s, image enabled: %s',
+    '[Migration] MCP bootstrap completed, imported %d missing defaults, updated image server: %s, updated browser server: %s, updated workbench server: %s, image config source: %s, image enabled: %s',
     missing.length,
     imageServerUpdated ? 'yes' : 'no',
     browserServerUpdated ? 'yes' : 'no',
+    workbenchServerUpdated ? 'yes' : 'no',
     imageConfigSource,
     imageConfig?.switch === true ? 'yes' : 'no'
   );
+}
+
+async function reconcileBuiltinScriptPath(
+  existing: IMcpServer[],
+  desired: McpImportServer,
+  label: string
+): Promise<boolean> {
+  const current = existing.find((server) => server.name === desired.name);
+  if (!current) return false;
+  const transportChanged = !isSameStdioTransport(current.transport, desired.transport);
+  const jsonChanged = current.original_json !== desired.original_json;
+  if (!transportChanged && !jsonChanged) return false;
+  console.info(
+    '[Migration] %s MCP path drifted, server id: %s, transport changed: %s, json changed: %s',
+    label,
+    current.id,
+    transportChanged ? 'yes' : 'no',
+    jsonChanged ? 'yes' : 'no'
+  );
+  await mcpService.updateServer.invoke({
+    id: current.id,
+    data: {
+      transport: desired.transport,
+      original_json: desired.original_json,
+    },
+  });
+  return true;
 }
 
 const MIGRATION_STEPS: Array<{

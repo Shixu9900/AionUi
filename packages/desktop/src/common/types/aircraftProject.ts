@@ -31,6 +31,11 @@ export type AircraftProject = {
   kind: AircraftProjectKind;
   workspace?: string;
   readiness?: RedeliveryReadiness;
+  /**
+   * The single conversation that is this project's context. Bound on first
+   * send from guid, or by adopting a qualifying existing aionrs conversation.
+   */
+  conversationId?: string;
   createdAt: number;
   updatedAt: number;
 };
