@@ -4,15 +4,21 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ComponentReview, Stint } from '@/common/types/recordsReview';
+import Chart, { type ChartOption } from '@/renderer/components/charts/Chart';
+import { CHART_SERIES_PALETTE, seriesColor } from '@/renderer/components/charts/chartPalette';
+import { useChartTheme } from '@/renderer/hooks/theme/useChartTheme';
 
 const DAY = 86_400_000;
 const W = 1000;
 const LEFT = 108;
 const RIGHT = 16;
-const STINT_COLORS = ['#3b82f6', '#14b8a6', '#8b5cf6', '#f59e0b'];
+// The Gantt-style lanes above still address bars directly by hex, so keep this
+// as a plain alias of the shared palette's light set rather than switching
+// those bars to `useChartTheme()` in this change.
+const STINT_COLORS = CHART_SERIES_PALETTE.light;
 
 const ms = (d: string) => Date.parse(d);
 const days = (a: string, b: string) => Math.round((ms(b) - ms(a)) / DAY);
@@ -338,20 +344,21 @@ const Budget: React.FC<{ limit: number; recorded: number; estimated: number; sti
   stints,
 }) => {
   const { t } = useTranslation();
+  const theme = useChartTheme();
   const remain = Math.max(0, limit - recorded - estimated);
   const segs = [
     ...stints.map((s, i) => ({
       key: s.from,
       value: s.used_csn ?? 0,
-      fill: STINT_COLORS[i % STINT_COLORS.length],
-      label: s.host.aircraft || s.operator,
+      color: seriesColor(theme.appearance, i),
+      label: s.host.aircraft || s.operator || t('conversation.workbench.lifeTrack.operatorUnrecorded'),
     })),
     ...(estimated > 0
       ? [
           {
             key: 'est',
             value: estimated,
-            fill: 'repeating-linear-gradient(45deg,#e5484d,#e5484d 2px,transparent 2px,transparent 5px)',
+            color: theme.limit,
             label: t('conversation.workbench.lifeTrack.unrecordedEstimate', { value: fmtN(estimated) }),
           },
         ]
@@ -359,16 +366,37 @@ const Budget: React.FC<{ limit: number; recorded: number; estimated: number; sti
     {
       key: 'rem',
       value: remain,
-      fill: 'var(--color-fill-3)',
+      color: theme.muted,
       label: t('conversation.workbench.lifeTrack.remainingBudget', { value: fmtN(remain) }),
     },
   ].filter((s) => s.value > 0);
+
+  // One category, one stacked bar per segment: each series' value is the
+  // segment's own CSN count (not a percentage), with the axis capped at
+  // `limit` — matching the original flex-width-by-fraction bar, including
+  // leaving blank space when the segments do not add up to the full limit.
+  const option: ChartOption = useMemo(
+    () => ({
+      grid: { left: 0, right: 0, top: 0, bottom: 0 },
+      xAxis: { type: 'value', max: limit, show: false },
+      yAxis: { type: 'category', data: ['budget'], show: false },
+      tooltip: { trigger: 'item' },
+      series: segs.map((s) => ({
+        name: s.label,
+        type: 'bar' as const,
+        stack: 'budget',
+        barWidth: '100%',
+        data: [s.value],
+        itemStyle: { color: s.color },
+      })),
+    }),
+    [segs, limit]
+  );
+
   return (
     <div>
-      <div className='flex h-28px overflow-hidden rd-4px'>
-        {segs.map((s) => (
-          <div key={s.key} style={{ width: `${(s.value / limit) * 100}%`, background: s.fill }} title={s.label} />
-        ))}
+      <div className='h-28px overflow-hidden rd-4px'>
+        <Chart option={option} height={28} />
       </div>
       <div className='mt-4px text-11px text-t-tertiary'>
         {t('conversation.workbench.lifeTrack.budgetCaption', { limit: fmtN(limit), recorded: fmtN(recorded) })}

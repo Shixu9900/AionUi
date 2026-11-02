@@ -43,6 +43,7 @@
   --warning: #ff7d00;
   --danger: #f53f3f;
   --info: #165dff;
+  --limit: #c026d3; /* 寿命限值/目标线 — 品红，仅用于限值标线，不用作状态色 */
 
   /* Border Colors - Light Mode */
   --border-base: #e5e6eb; /* 基础边框 */
@@ -116,6 +117,7 @@
   --warning: #ff9a2e;
   --danger: #f76560;
   --info: #4d9fff;
+  --limit: #e879f9; /* 寿命限值/目标线 — 暗色模式提亮 */
 
   /* Border Colors - Dark Mode */
   --border-base: #333333; /* 基础边框 */

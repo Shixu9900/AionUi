@@ -73,6 +73,12 @@ export const THEME_TOKENS: readonly ThemeTokenDescriptor[] = [
   { key: '--warning', group: 'semantic', scope: 'appearance-scoped', description: 'Warning color' },
   { key: '--danger', group: 'semantic', scope: 'appearance-scoped', description: 'Danger / error color' },
   { key: '--info', group: 'semantic', scope: 'appearance-scoped', description: 'Info color' },
+  {
+    key: '--limit',
+    group: 'semantic',
+    scope: 'appearance-scoped',
+    description: 'Life-limit / target line color (charts only, not a status color)',
+  },
 
   // Brand
   { key: '--brand', group: 'brand', scope: 'appearance-scoped', description: 'Brand color' },
