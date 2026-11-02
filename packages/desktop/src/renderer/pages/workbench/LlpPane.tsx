@@ -8,6 +8,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ComponentReview, PartNode } from '@/common/types/recordsReview';
 import LifeTrack from './LifeTrack';
+import { LLP_PACKAGE_ITEM, type LlpTarget } from './deliveryPackage';
 import { patchWorkbench, useWorkbenchState, type WorkbenchFocus } from './workbenchStore';
 
 type Row = { id: string; label: string; detail: string; depth: number; reviewable: boolean };
@@ -48,6 +49,8 @@ const LlpPane: React.FC<{ review: ComponentReview | null }> = ({ review }) => {
   ];
   const active = selectedId ?? tree.find((row) => row.reviewable)?.id ?? 'engine';
   const showReview = review != null && (active === 'engine' || tree.some((row) => row.id === active && row.reviewable));
+  const assembly: LlpTarget = active === 'apu' || active === 'gear' ? active : 'engine';
+  const packageCode = LLP_PACKAGE_ITEM[assembly];
 
   return (
     <div className='grid gap-16px' style={{ gridTemplateColumns: 'minmax(220px, 320px) minmax(0, 1fr)' }}>
@@ -69,7 +72,14 @@ const LlpPane: React.FC<{ review: ComponentReview | null }> = ({ review }) => {
           </button>
         ))}
       </div>
-      <div className='min-w-0'>
+      <div className='min-w-0 flex flex-col gap-10px'>
+        <button
+          type='button'
+          className='self-start text-12px text-[rgb(var(--primary-6))] bg-transparent border-0 p-0 cursor-pointer'
+          onClick={() => patchWorkbench({ page: 'records', packageItem: packageCode })}
+        >
+          {t('conversation.workbench.package.openFiles', { code: packageCode })}
+        </button>
         {showReview && review ? (
           <FocusBody review={review} focus={focus} lifeView={lifeView} />
         ) : (

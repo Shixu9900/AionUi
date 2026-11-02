@@ -20,8 +20,10 @@ export type WorkbenchState = {
   focus: WorkbenchFocus;
   driveId: string;
   aircraftId: string | null;
-  /** Selected LLP node or IATA file id. */
+  /** Selected LLP node. */
   selectedId: string | null;
+  /** Selected Annex II item in the delivery package, e.g. `F007`. */
+  packageItem: string | null;
 };
 
 const AIRCRAFT_KEY = 'aviator.activeProjectId';
@@ -43,6 +45,7 @@ let state: WorkbenchState = {
   driveId: 'verdict',
   aircraftId: readAircraftId(),
   selectedId: null,
+  packageItem: null,
 };
 
 const listeners = new Set<() => void>();
@@ -70,5 +73,5 @@ export const patchWorkbench = (patch: Partial<WorkbenchState>): void => {
 
 export const setWorkbenchAircraft = (aircraftId: string | null): void => {
   if (aircraftId === state.aircraftId) return;
-  patchWorkbench({ aircraftId, subject: 'aircraft', page: 'overview' });
+  patchWorkbench({ aircraftId, subject: 'aircraft', page: 'overview', packageItem: null });
 };

@@ -19,7 +19,7 @@ import { useRecordsReview } from '@renderer/pages/conversation/recordsReview/use
 import LifeTrack from './LifeTrack';
 import LlpPane from './LlpPane';
 import ReadinessBadge from './ReadinessBadge';
-import RecordsPane from './RecordsPane';
+import PackagePane from './PackagePane';
 import TraceButtons, { CHOICE_COLOR } from './TraceButtons';
 import { patchWorkbench, useWorkbenchState, type WorkbenchPage } from './workbenchStore';
 
@@ -230,6 +230,9 @@ const ProjectSite: React.FC = () => {
             onJudge={judge}
             actions={trace.actions}
             rubric={trace.rubric}
+            workspace={aircraft?.workspace}
+            aircraftType={aircraft?.aircraftType}
+            onEditWorkspace={() => setEditing(true)}
           />
         )}
       </div>
@@ -299,6 +302,9 @@ type SiteBodyProps = {
   onJudge: (checkpoint: Checkpoint) => (choice: ReviewChoice, note?: string) => Promise<void>;
   actions: ReviewAction[];
   rubric: ReviewRubric;
+  workspace?: string;
+  aircraftType?: string;
+  onEditWorkspace: () => void;
 };
 
 const SiteBody: React.FC<SiteBodyProps> = (props) => {
@@ -317,7 +323,16 @@ const SiteBody: React.FC<SiteBodyProps> = (props) => {
     case 'llp':
       return <LlpPane review={review} />;
     case 'records':
-      return <RecordsPane documents={review?.documents ?? []} fileUrl={props.fileUrl} />;
+      return (
+        <PackagePane
+          workspace={props.workspace}
+          aircraftType={props.aircraftType}
+          documents={review?.documents ?? []}
+          reviewFileUrl={props.fileUrl}
+          esn={review?.timeline.find((e) => e.host.esn)?.host.esn ?? undefined}
+          onEditWorkspace={props.onEditWorkspace}
+        />
+      );
     case 'report':
       return <ReportPane actions={props.actions} rubric={props.rubric} />;
     default: {

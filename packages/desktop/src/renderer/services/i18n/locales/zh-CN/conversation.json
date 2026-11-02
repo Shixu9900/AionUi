@@ -875,7 +875,7 @@
     "pages": {
       "overview": "结论",
       "llp": "LLP",
-      "records": "资料",
+      "records": "交付包",
       "report": "报告"
     },
     "lifeView": {
@@ -902,11 +902,6 @@
     },
     "llpMissing": "这一级的资料还没有",
     "gear": "起落架",
-    "recordsHint": "按进退租资料目录。点开章节，再点文件，原文显示在右侧。",
-    "ready": "{{count}} 份已归位",
-    "notReady": "未就绪",
-    "unfiled": "还没归进章节的文件",
-    "pickFile": "点左侧一份文件，这里显示它的页面。",
     "focus": {
       "life": "寿命",
       "evidence": "证据",
@@ -975,6 +970,43 @@
       "colSystem": "系统结果",
       "colChoice": "判断",
       "colNote": "说明"
+    },
+    "package": {
+      "noWorkspace": "这架飞机还没有指定资料文件夹。指定后，这里按 IATA 交付目录列出每一项有没有文件。",
+      "setWorkspace": "指定资料文件夹",
+      "readFailed": "读取资料文件夹失败",
+      "rescan": "重新扫描",
+      "present": "有 {{n}} 项",
+      "missing": "缺 {{n}} 项",
+      "na": "不适用 {{n}} 项",
+      "style": {
+        "iata-items": "按 IATA 项号编排",
+        "letter-only": "只分到字母组",
+        "other-numbering": "用了别的编号",
+        "work-type": "按工作类型编排",
+        "empty": "文件夹是空的"
+      },
+      "status": {
+        "present": "有",
+        "missing": "缺",
+        "na": "不适用"
+      },
+      "groupLoose": "组内未分项的文件",
+      "inherited": "上一手交付包（整体保留）",
+      "unfiled": "认不出的文件夹",
+      "pickItem": "点左侧一项，这里显示它的文件、对应的审查工作流和原文。",
+      "folderName": "文件夹原名：{{name}}",
+      "fileCount": "{{n}} 份文件",
+      "reviewCited": "部件审查引用的文件",
+      "reviewed": "正在审查的这台",
+      "openSystem": "用系统打开",
+      "openFiles": "看交付包里的文件（{{code}}）",
+      "workflow": {
+        "completeness": "齐全检查",
+        "status": "状态清单",
+        "llp": "LLP 审查",
+        "history": "履历追溯"
+      }
     }
   }
 }

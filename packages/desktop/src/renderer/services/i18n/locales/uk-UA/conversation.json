@@ -891,7 +891,7 @@
     "pages": {
       "overview": "Verdict",
       "llp": "LLP",
-      "records": "Records",
+      "records": "Delivery package",
       "report": "Report"
     },
     "lifeView": {
@@ -918,11 +918,6 @@
     },
     "llpMissing": "No records at this level yet",
     "gear": "Landing gear",
-    "recordsHint": "Redelivery records index. Open a section, then a file. The page shows on the right.",
-    "ready": "{{count}} filed",
-    "notReady": "Not ready",
-    "unfiled": "Not filed in a section yet",
-    "pickFile": "Pick a file to show its page here.",
     "focus": {
       "life": "Life",
       "evidence": "Evidence",
@@ -991,6 +986,43 @@
       "colSystem": "System result",
       "colChoice": "Judgement",
       "colNote": "Note"
+    },
+    "package": {
+      "noWorkspace": "No records folder is set for this aircraft. Once set, this lists every IATA delivery item and whether it has files.",
+      "setWorkspace": "Set records folder",
+      "readFailed": "Could not read the records folder",
+      "rescan": "Rescan",
+      "present": "{{n}} present",
+      "missing": "{{n}} missing",
+      "na": "{{n}} not applicable",
+      "style": {
+        "iata-items": "Filed by IATA item",
+        "letter-only": "Filed by letter group only",
+        "other-numbering": "Uses other numbering",
+        "work-type": "Filed by work type",
+        "empty": "Folder is empty"
+      },
+      "status": {
+        "present": "Present",
+        "missing": "Missing",
+        "na": "N/A"
+      },
+      "groupLoose": "Files not under an item",
+      "inherited": "Previous bible (kept whole)",
+      "unfiled": "Unrecognised folders",
+      "pickItem": "Pick an item on the left to see its files, the review workflows it feeds and the source pages.",
+      "folderName": "Folder name: {{name}}",
+      "fileCount": "{{n}} files",
+      "reviewCited": "Files cited by the component review",
+      "reviewed": "Under review",
+      "openSystem": "Open in system app",
+      "openFiles": "Files in the delivery package ({{code}})",
+      "workflow": {
+        "completeness": "Completeness",
+        "status": "Status lists",
+        "llp": "LLP review",
+        "history": "History trace"
+      }
     }
   }
 }

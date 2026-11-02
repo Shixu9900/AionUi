@@ -875,7 +875,7 @@
     "pages": {
       "overview": "結論",
       "llp": "LLP",
-      "records": "資料",
+      "records": "交付包",
       "report": "報告"
     },
     "lifeView": {
@@ -902,11 +902,6 @@
     },
     "llpMissing": "這一級的資料還沒有",
     "gear": "起落架",
-    "recordsHint": "按進退租資料目錄。點開章節，再點檔案，原文顯示在右側。",
-    "ready": "{{count}} 份已歸位",
-    "notReady": "未就緒",
-    "unfiled": "還沒歸進章節的檔案",
-    "pickFile": "點左側一份檔案，這裡顯示它的頁面。",
     "focus": {
       "life": "壽命",
       "evidence": "證據",
@@ -975,6 +970,43 @@
       "colSystem": "System result",
       "colChoice": "Judgement",
       "colNote": "Note"
+    },
+    "package": {
+      "noWorkspace": "這架飛機還沒有指定資料資料夾。指定後，這裡按 IATA 交付目錄列出每一項有沒有文件。",
+      "setWorkspace": "指定資料資料夾",
+      "readFailed": "讀取資料資料夾失敗",
+      "rescan": "重新掃描",
+      "present": "有 {{n}} 項",
+      "missing": "缺 {{n}} 項",
+      "na": "不適用 {{n}} 項",
+      "style": {
+        "iata-items": "按 IATA 項號編排",
+        "letter-only": "只分到字母組",
+        "other-numbering": "用了別的編號",
+        "work-type": "按工作類型編排",
+        "empty": "資料夾是空的"
+      },
+      "status": {
+        "present": "有",
+        "missing": "缺",
+        "na": "不適用"
+      },
+      "groupLoose": "組內未分項的文件",
+      "inherited": "上一手交付包（整體保留）",
+      "unfiled": "認不出的資料夾",
+      "pickItem": "點左側一項，這裡顯示它的文件、對應的審查工作流和原文。",
+      "folderName": "資料夾原名：{{name}}",
+      "fileCount": "{{n}} 份文件",
+      "reviewCited": "部件審查引用的文件",
+      "reviewed": "正在審查的這台",
+      "openSystem": "用系統開啟",
+      "openFiles": "看交付包裡的文件（{{code}}）",
+      "workflow": {
+        "completeness": "齊全檢查",
+        "status": "狀態清單",
+        "llp": "LLP 審查",
+        "history": "履歷追溯"
+      }
     }
   }
 }
