@@ -11,6 +11,11 @@ describe('CHART_SERIES_PALETTE', () => {
   it('has the same number of hues in light and dark', () => {
     expect(CHART_SERIES_PALETTE.dark.length).toBe(CHART_SERIES_PALETTE.light.length);
   });
+
+  it('keeps the shared six-hue palette instead of a per-theme Aviator series', () => {
+    expect([...CHART_SERIES_PALETTE.light]).toEqual(['#3b82f6', '#14b8a6', '#8b5cf6', '#f59e0b', '#ec4899', '#64748b']);
+    expect([...CHART_SERIES_PALETTE.dark]).toEqual(['#60a5fa', '#2dd4bf', '#a78bfa', '#fbbf24', '#f472b6', '#94a3b8']);
+  });
 });
 
 describe('seriesColor', () => {
