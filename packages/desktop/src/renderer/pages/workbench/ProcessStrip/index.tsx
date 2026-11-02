@@ -13,7 +13,8 @@ import {
   type LifeView,
   type WorkbenchFocus,
   type WorkbenchPage,
-} from './workbenchStore';
+} from '../workbenchStore';
+import styles from './ProcessStrip.module.css';
 
 type Drive = {
   id: string;
@@ -45,29 +46,28 @@ const ProcessStrip: React.FC = () => {
         {t(`conversation.workbench.pages.${wb.page}`)}
       </div>
       <div className='flex gap-4px flex-wrap'>
-        {DRIVES.map((item) => (
-          <button
-            key={item.id}
-            type='button'
-            className={`text-left text-12px px-6px py-2px rd-4px cursor-pointer border border-solid ${
-              wb.driveId === item.id
-                ? 'border-[rgb(var(--primary-6))] text-t-primary'
-                : 'border-transparent text-t-secondary hover:bg-fill-2'
-            }`}
-            onClick={() =>
-              patchWorkbench({
-                driveId: item.id,
-                page: item.page,
-                subject: 'aircraft',
-                focus: item.focus,
-                lifeView: item.lifeView,
-                evMetric: item.evMetric,
-              })
-            }
-          >
-            {t(`conversation.workbench.drives.${item.say}`)}
-          </button>
-        ))}
+        {DRIVES.map((item) => {
+          const active = wb.driveId === item.id;
+          return (
+            <button
+              key={item.id}
+              type='button'
+              className={active ? `${styles.drive} ${styles.driveActive}` : styles.drive}
+              onClick={() =>
+                patchWorkbench({
+                  driveId: item.id,
+                  page: item.page,
+                  subject: 'aircraft',
+                  focus: item.focus,
+                  lifeView: item.lifeView,
+                  evMetric: item.evMetric,
+                })
+              }
+            >
+              {t(`conversation.workbench.drives.${item.say}`)}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

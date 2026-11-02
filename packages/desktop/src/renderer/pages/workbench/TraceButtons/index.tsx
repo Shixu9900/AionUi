@@ -8,11 +8,25 @@ import React, { useState } from 'react';
 import { Input, Message, Modal } from '@arco-design/web-react';
 import { useTranslation } from 'react-i18next';
 import type { ReviewAction, ReviewChoice } from '@/common/types/aircraftProject';
+import styles from './TraceButtons.module.css';
 
+/** Ink for notes and the report log. Buttons use the same tokens in TraceButtons.module.css. */
 export const CHOICE_COLOR: Record<ReviewChoice, string> = {
-  correct: '#30a46c',
-  wrong: '#e5484d',
-  supplement: '#3b82f6',
+  correct: 'color-mix(in srgb, var(--success) 62%, var(--text-primary))',
+  wrong: 'color-mix(in srgb, var(--danger) 62%, var(--text-primary))',
+  supplement: 'var(--primary)',
+};
+
+const TONE_CLASS: Record<ReviewChoice, string> = {
+  correct: styles.correct,
+  wrong: styles.wrong,
+  supplement: styles.supplement,
+};
+
+const ACTIVE_TONE_CLASS: Record<ReviewChoice, string> = {
+  correct: styles.correctActive,
+  wrong: styles.wrongActive,
+  supplement: styles.supplementActive,
 };
 
 const CHOICES: ReviewChoice[] = ['correct', 'wrong', 'supplement'];
@@ -64,12 +78,11 @@ const TraceButtons: React.FC<TraceButtonsProps> = ({ label, systemValue, latest,
               disabled={disabled}
               title={t(`conversation.workbench.trace.${choice}`)}
               onClick={() => pick(choice)}
-              className='h-20px px-6px rd-4px text-11px border border-solid cursor-pointer disabled:cursor-not-allowed disabled:opacity-40'
-              style={{
-                borderColor: active ? CHOICE_COLOR[choice] : 'var(--color-border-2)',
-                background: active ? CHOICE_COLOR[choice] : 'transparent',
-                color: active ? '#fff' : 'var(--color-text-2)',
-              }}
+              className={
+                active
+                  ? `${styles.choice} ${TONE_CLASS[choice]} ${ACTIVE_TONE_CLASS[choice]}`
+                  : `${styles.choice} ${TONE_CLASS[choice]}`
+              }
             >
               {`${GLYPH[choice]} ${t(`conversation.workbench.trace.${choice}`)}`}
             </button>
