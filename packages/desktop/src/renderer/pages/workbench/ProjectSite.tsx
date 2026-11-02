@@ -25,6 +25,9 @@ import { patchWorkbench, useWorkbenchState, type WorkbenchPage } from './workben
 
 const PAGES: WorkbenchPage[] = ['overview', 'llp', 'records', 'report'];
 
+/** Judging and the readiness gate stay hidden until the scoring UI is redesigned; recorded judgements are kept. */
+const SHOW_JUDGING = false;
+
 const fmtN = (n: number | null | undefined) => (n == null ? '—' : Math.round(n).toLocaleString('en-US'));
 const fmtH = (n: number | null | undefined) => {
   if (n == null) return '—';
@@ -175,13 +178,15 @@ const ProjectSite: React.FC = () => {
           </div>
           {aircraft && (
             <div className='flex flex-col items-end gap-6px shrink-0'>
-              <ReadinessControl
-                readiness={readiness}
-                confirmed={confirmed}
-                total={checkpoints.length}
-                allConfirmed={allConfirmed}
-                onChange={setReadiness}
-              />
+              {SHOW_JUDGING && (
+                <ReadinessControl
+                  readiness={readiness}
+                  confirmed={confirmed}
+                  total={checkpoints.length}
+                  allConfirmed={allConfirmed}
+                  onChange={setReadiness}
+                />
+              )}
               <button
                 type='button'
                 className='text-12px text-t-secondary bg-transparent border-0 cursor-pointer p-0'
@@ -341,15 +346,17 @@ const Overview: React.FC<SiteBodyProps & { review: ComponentReview }> = ({
           {t('conversation.workbench.remaining', { n: fmtN(review.life.remaining_cycles) })}
           {ratio != null ? ` · ${Math.round(ratio * 1000) / 10}%` : ''}
         </span>
-        <span className='ms-auto'>
-          <TraceButtons
-            label={verdict.label}
-            systemValue={verdict.value}
-            latest={latest.get(verdict.target)}
-            disabled={!canJudge}
-            onRecord={onJudge(verdict)}
-          />
-        </span>
+        {SHOW_JUDGING && (
+          <span className='ms-auto'>
+            <TraceButtons
+              label={verdict.label}
+              systemValue={verdict.value}
+              latest={latest.get(verdict.target)}
+              disabled={!canJudge}
+              onRecord={onJudge(verdict)}
+            />
+          </span>
+        )}
       </div>
       <div className='grid grid-cols-4 gap-8px'>
         {figures.map((cp) => (
@@ -365,13 +372,15 @@ const Overview: React.FC<SiteBodyProps & { review: ComponentReview }> = ({
               <div className='text-18px font-600 text-t-primary'>{cp.value}</div>
               <div className='text-12px text-t-tertiary'>{cp.label}</div>
             </button>
-            <TraceButtons
-              label={cp.label}
-              systemValue={cp.value}
-              latest={latest.get(cp.target)}
-              disabled={!canJudge}
-              onRecord={onJudge(cp)}
-            />
+            {SHOW_JUDGING && (
+              <TraceButtons
+                label={cp.label}
+                systemValue={cp.value}
+                latest={latest.get(cp.target)}
+                disabled={!canJudge}
+                onRecord={onJudge(cp)}
+              />
+            )}
           </div>
         ))}
       </div>
