@@ -5,6 +5,7 @@
  */
 
 import type { IMessageText } from '@/common/chat/chatLib';
+import { firstTwoNonEmptyLines } from '@/common/chat/workbenchReply';
 import { parseFileMarker, resolveMessageFilePath } from './fileMarker';
 import SessionMentionAction from './SessionMentionAction';
 import { parseSessionMessageBlock, parseSessionsBlock } from './sessionMarkers';
@@ -103,7 +104,9 @@ const MessageText: React.FC<{
   /** All text segments of this message's turn, in order — the copy button
    * copies the whole reply, not just the segment it happens to sit on. */
   turnTexts?: string[];
-}> = ({ message, showCopyRow = true, isLastMessage = false, hasForkAnchor = false, turnTexts }) => {
+  /** Engineer workbench: fold a long assistant reply after workbench_show. */
+  clampToTwoLines?: boolean;
+}> = ({ message, showCopyRow = true, isLastMessage = false, hasForkAnchor = false, turnTexts, clampToTwoLines = false }) => {
   const logos = useAgentLogos();
   // Filter think tags from content before rendering
   // 在渲染前过滤 think 标签
@@ -162,7 +165,15 @@ const MessageText: React.FC<{
         { memberName: contextResetNotice.member_name }
       )
     : visibleText;
-  const { data, json } = useFormatContent(renderedText);
+  const [expanded, setExpanded] = useState(false);
+  const clampedReply = useMemo(() => {
+    if (!clampToTwoLines || isUserMessage || typeof renderedText !== 'string') {
+      return { text: renderedText, clamped: false };
+    }
+    const { preview, clamped } = firstTwoNonEmptyLines(renderedText);
+    return { text: expanded || !clamped ? renderedText : preview, clamped };
+  }, [clampToTwoLines, expanded, isUserMessage, renderedText]);
+  const { data, json } = useFormatContent(clampedReply.text);
   const shouldRenderPlainText = isUserMessage || Boolean(contextResetNotice);
   const conversationContext = useConversationContextSafe();
   const forkConversation = useForkConversation(conversationContext?.conversation_id);
@@ -326,7 +337,7 @@ const MessageText: React.FC<{
           {/* JSON 内容使用折叠组件 Use CollapsibleContent for JSON content */}
           {shouldRenderPlainText ? (
             <div className='whitespace-pre-wrap [overflow-wrap:anywhere]' data-testid='message-text-content'>
-              {renderedText}
+              {clampedReply.text}
             </div>
           ) : json ? (
             <CollapsibleContent maxHeight={200} defaultCollapsed={true}>
@@ -343,6 +354,18 @@ const MessageText: React.FC<{
                 {data}
               </MarkdownView>
             </div>
+          )}
+          {clampedReply.clamped && (
+            <button
+              type='button'
+              className='mt-6px text-12px text-t-secondary hover:text-t-primary cursor-pointer bg-transparent border-none p-0'
+              data-testid='message-text-expand'
+              onClick={() => setExpanded((value) => !value)}
+            >
+              {expanded
+                ? t('conversation.workbench.collapseConclusion', { defaultValue: 'Show less' })
+                : t('conversation.workbench.expandConclusion', { defaultValue: 'Show more' })}
+            </button>
           )}
         </div>
         {isPendingDelivery && (

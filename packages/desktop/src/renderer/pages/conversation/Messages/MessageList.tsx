@@ -6,6 +6,9 @@
 
 import type { IConversationArtifact } from '@/common/adapter/ipcBridge';
 import type { IMessageAcpToolCall, IMessageToolCall, IMessageToolGroup, TMessage } from '@/common/chat/chatLib';
+import { workbenchReplyTextIds } from '@/common/chat/workbenchReply';
+import { isWorkbenchShowToolName } from '@/common/chat/workbenchShow';
+import { useEngineerMode } from '@/renderer/hooks/config/useEngineerMode';
 import { useConversationContextSafe } from '@/renderer/hooks/context/ConversationContext';
 import { useConversationRuntimeView } from '@/renderer/pages/conversation/runtime/useConversationRuntimeView';
 import { getChatSurfaceWidthClass } from '@/renderer/pages/conversation/utils/chatSurfaceWidth';
@@ -42,6 +45,7 @@ import MessageTips from './components/MessageTips';
 import MessageToolCall from './components/MessageToolCall';
 import MessageToolGroup from './components/MessageToolGroup';
 import MessageToolGroupSummary from './components/MessageToolGroupSummary';
+import MessageWorkbenchJump from './components/MessageWorkbenchJump';
 import MessageCronTrigger from './components/MessageCronTrigger';
 import MessageSkillSuggest from './components/MessageSkillSuggest';
 import MessageText from './components/MessageText';
@@ -227,6 +231,7 @@ const MessageItem: React.FC<{
   isLastMessage?: boolean;
   hasForkAnchor?: boolean;
   turnTexts?: string[];
+  clampToTwoLines?: boolean;
 }> = React.memo(
   HOC((props) => {
     const { message, highlighted, rowWidthClass } = props as {
@@ -261,6 +266,7 @@ const MessageItem: React.FC<{
       isLastMessage,
       hasForkAnchor,
       turnTexts,
+      clampToTwoLines,
     }: {
       message: TMessage;
       highlighted?: boolean;
@@ -269,6 +275,7 @@ const MessageItem: React.FC<{
       isLastMessage?: boolean;
       hasForkAnchor?: boolean;
       turnTexts?: string[];
+      clampToTwoLines?: boolean;
     }) => {
       const { t } = useTranslation();
       switch (message.type) {
@@ -280,11 +287,15 @@ const MessageItem: React.FC<{
               isLastMessage={isLastMessage}
               hasForkAnchor={hasForkAnchor}
               turnTexts={turnTexts}
+              clampToTwoLines={clampToTwoLines}
             ></MessageText>
           );
         case 'tips':
           return <MessageTips message={message}></MessageTips>;
         case 'tool_call':
+          if (isWorkbenchShowToolName(message.content.name)) {
+            return <MessageWorkbenchJump message={message}></MessageWorkbenchJump>;
+          }
           return <MessageToolCall message={message}></MessageToolCall>;
         case 'tool_group':
           return <MessageToolGroup message={message}></MessageToolGroup>;
@@ -328,7 +339,8 @@ const MessageItem: React.FC<{
     // would defeat the memo for the one row that carries the copy button.
     (prev.turnTexts === next.turnTexts ||
       (prev.turnTexts?.length === next.turnTexts?.length &&
-        (prev.turnTexts ?? []).every((segment, i) => segment === next.turnTexts?.[i])))
+        (prev.turnTexts ?? []).every((segment, i) => segment === next.turnTexts?.[i]))) &&
+    prev.clampToTwoLines === next.clampToTwoLines
 );
 
 const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }> = ({ emptySlot }) => {
@@ -344,6 +356,7 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
   // moving down, so we defer its copy/timestamp row until the turn finishes to
   // avoid the row flashing in and the layout reflowing mid-stream.
   const { isProcessing } = useConversationRuntimeView(conversationContext?.conversation_id ?? '');
+  const engineerMode = useEngineerMode();
   const { t } = useTranslation();
   const location = useLocation();
   const locationState = (location.state || {}) as ConversationLocationState;
@@ -436,6 +449,10 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
         continue;
       }
       if (message.type === 'tool_call') {
+        if (isWorkbenchShowToolName(message.content.name)) {
+          pushStandaloneMessage(message);
+          continue;
+        }
         pushToolList(message);
         continue;
       }
@@ -472,6 +489,7 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
     () => collectAiCopyRows(processedList as TurnCopyItem[], isProcessing),
     [processedList, isProcessing]
   );
+  const workbenchReplyIds = useMemo(() => (engineerMode ? workbenchReplyTextIds(list) : new Set<string>()), [engineerMode, list]);
 
   // The last REAL message in the visible timeline (pseudo entries like
   // file/tool summaries don't count). HEAD-fork backends (claude/ACP) only
@@ -721,6 +739,7 @@ const MessageList: React.FC<{ className?: string; emptySlot?: React.ReactNode }>
         isLastMessage={message.id === lastMessageId}
         hasForkAnchor={forkAnchoredIds.has(message.id)}
         turnTexts={aiTurnTextsById.get(message.id)}
+        clampToTwoLines={workbenchReplyIds.has(message.id)}
       ></MessageItem>
     );
   };
