@@ -1,0 +1,42 @@
+/* Cabin switch. Explicit fill resets macOS/Electron light button chrome. */
+
+.drive {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+  background-color: var(--workspace-btn-bg);
+  background-image: none;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  box-shadow: none;
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+}
+
+.drive:hover:not(.driveActive) {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.driveActive {
+  background-color: var(--brand-light);
+  border-color: var(--primary);
+  color: var(--brand-hover);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--primary) 35%, transparent),
+    inset 0 0 12px color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.drive:focus {
+  outline: none;
+}
+
+.drive:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}

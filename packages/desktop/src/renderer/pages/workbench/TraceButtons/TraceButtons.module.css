@@ -1,0 +1,76 @@
+/* Soft status capsules. Supplement is action chrome via --primary, not a fourth hue. */
+
+.choice {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+  background-image: none;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  box-shadow: none;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.3;
+  cursor: pointer;
+}
+
+.choice:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.choice:focus {
+  outline: none;
+}
+
+.choice:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Ink is mixed toward --text-primary so the same hue stays readable on cabin black and on paper. */
+.correct {
+  background-color: color-mix(in srgb, var(--success) 16%, transparent);
+  color: color-mix(in srgb, var(--success) 62%, var(--text-primary));
+}
+
+.wrong {
+  background-color: color-mix(in srgb, var(--danger) 16%, transparent);
+  color: color-mix(in srgb, var(--danger) 62%, var(--text-primary));
+}
+
+.supplement {
+  background-color: color-mix(in srgb, var(--primary) 14%, transparent);
+  color: var(--primary);
+}
+
+.correctActive {
+  background-color: var(--success);
+  border-color: var(--success);
+  color: var(--text-white);
+}
+
+.wrongActive {
+  background-color: var(--danger);
+  border-color: var(--danger);
+  color: var(--text-white);
+}
+
+/* --inverse is near-black on Night Cruise amber and white on light-theme primaries. */
+.supplementActive {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--inverse);
+  font-weight: 650;
+}
+
+@supports (color: contrast-color(red)) {
+  .correctActive {
+    color: contrast-color(var(--success));
+  }
+
+  .wrongActive {
+    color: contrast-color(var(--danger));
+  }
+}
